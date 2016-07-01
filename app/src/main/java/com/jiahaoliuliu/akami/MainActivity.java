@@ -18,6 +18,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
+    private static final String ADDRESS_ADCB = "ADCBAlert";
 
     // Projection. The fields of the sms to be returned
     private static final String[] sProjection = {
@@ -26,9 +27,14 @@ public class MainActivity extends AppCompatActivity {
         Sms.COLUMN_ADDRESS,
         Sms.COLUMN_DATE,
         Sms.COLUMN_DATE_SENT,
-        Sms.COLUMN_BODY,
-        Sms.COLUMN_TYPE
+        Sms.COLUMN_BODY
     };
+
+    // Selection query
+    private static final String sSelectionClause = Sms.COLUMN_TYPE + "=? and " + Sms.COLUMN_ADDRESS + "=?";
+
+    // Selection arguments
+    private static final String[] sSelectionArgs = {"1", ADDRESS_ADCB};
 
     private Context mContext;
 
@@ -52,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
     private void readAllMessages() {
         List<Sms> smssList = new ArrayList<Sms>();
         Sms sms;
-        Cursor cursor = getContentResolver().query(Uri.parse("content://sms/inbox"), sProjection, null, null, null);
+        Cursor cursor = getContentResolver().query(Uri.parse("content://sms/inbox"), sProjection, sSelectionClause, sSelectionArgs, null);
         if (cursor.moveToFirst()) {
             do {
                 sms = new Sms();
@@ -62,13 +68,6 @@ public class MainActivity extends AppCompatActivity {
                 sms.setDate((cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_DATE))));
                 sms.setDateSent((cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_DATE_SENT))));
                 sms.setBody((cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_BODY))));
-
-                if (cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_TYPE)).contains("1")){
-                    sms.setType("inbox");
-                } else {
-                    sms.setType("sent---------------------------");
-                    break;
-                }
 
                 Log.v(TAG, "SMS read " + sms);
                 smssList.add(sms);
