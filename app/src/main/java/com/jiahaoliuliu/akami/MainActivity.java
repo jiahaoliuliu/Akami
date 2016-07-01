@@ -19,6 +19,17 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
+    // Projection. The fields of the sms to be returned
+    private static final String[] sProjection = {
+        Sms.COLUMN_ID,
+        Sms.COLUMN_THREAD_ID,
+        Sms.COLUMN_ADDRESS,
+        Sms.COLUMN_DATE,
+        Sms.COLUMN_DATE_SENT,
+        Sms.COLUMN_BODY,
+        Sms.COLUMN_TYPE
+    };
+
     private Context mContext;
 
     // Views
@@ -41,9 +52,8 @@ public class MainActivity extends AppCompatActivity {
     private void readAllMessages() {
         List<Sms> smssList = new ArrayList<Sms>();
         Sms sms;
-        Cursor cursor = getContentResolver().query(Uri.parse("content://sms/inbox"), null, null, null, null);
+        Cursor cursor = getContentResolver().query(Uri.parse("content://sms/inbox"), sProjection, null, null, null);
         if (cursor.moveToFirst()) {
-            String message = "";
             do {
                 sms = new Sms();
                 sms.set_id(cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_ID)));
