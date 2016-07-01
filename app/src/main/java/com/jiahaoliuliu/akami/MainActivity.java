@@ -21,22 +21,20 @@ public class MainActivity extends AppCompatActivity {
     private static final String ADDRESS_ADCB = "ADCBAlert";
 
     // Projection. The fields of the sms to be returned
-    private static final String[] sProjection = {
-        Sms.COLUMN_ID,
-        Sms.COLUMN_THREAD_ID,
-        Sms.COLUMN_ADDRESS,
+    private static final String[] PROJECTION = {
+//        Sms.COLUMN_ID,
         Sms.COLUMN_DATE,
-        Sms.COLUMN_DATE_SENT,
         Sms.COLUMN_BODY
     };
 
     // Selection query
-    private static final String sSelectionClause = Sms.COLUMN_TYPE + "=? and " + Sms.COLUMN_ADDRESS + "=?";
+    private static final String SELECTION_CLAUSE = Sms.COLUMN_TYPE + "=? and " + Sms.COLUMN_ADDRESS + "=?";
 
     // Selection arguments
-    private static final String[] sSelectionArgs = {"1", ADDRESS_ADCB};
+    private static final String[] SELECTION_ARGS = {"1", ADDRESS_ADCB};
 
-    private Context mContext;
+    // Sort order
+    private static final String SORT_ORDER = Sms.COLUMN_DATE + " DESC";
 
     // Views
     private TextView mMessagesTextView;
@@ -45,8 +43,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        this.mContext = this;
 
         // Link the views
         mMessagesTextView = (TextView) findViewById(R.id.messages);
@@ -58,15 +54,12 @@ public class MainActivity extends AppCompatActivity {
     private void readAllMessages() {
         List<Sms> smssList = new ArrayList<Sms>();
         Sms sms;
-        Cursor cursor = getContentResolver().query(Uri.parse("content://sms/inbox"), sProjection, sSelectionClause, sSelectionArgs, null);
+        Cursor cursor = getContentResolver().query(Uri.parse("content://sms/inbox"), PROJECTION, SELECTION_CLAUSE, SELECTION_ARGS, SORT_ORDER);
         if (cursor.moveToFirst()) {
             do {
                 sms = new Sms();
-                sms.set_id(cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_ID)));
-                sms.setThreadId(cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_THREAD_ID)));
-                sms.setAddress(cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_ADDRESS)));
+//                sms.set_id(cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_ID)));
                 sms.setDate((cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_DATE))));
-                sms.setDateSent((cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_DATE_SENT))));
                 sms.setBody((cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_BODY))));
 
                 Log.v(TAG, "SMS read " + sms);
