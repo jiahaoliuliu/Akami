@@ -10,6 +10,7 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.TextView;
 
+import com.jiahaoliuliu.akami.model.Expense;
 import com.jiahaoliuliu.akami.model.Sms;
 
 import java.util.ArrayList;
@@ -39,6 +40,9 @@ public class MainActivity extends AppCompatActivity {
     // Views
     private TextView mMessagesTextView;
 
+    // Internal variables
+    private List<Expense> expensesList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,30 +51,30 @@ public class MainActivity extends AppCompatActivity {
         // Link the views
         mMessagesTextView = (TextView) findViewById(R.id.messages);
 
-        // read messages
-        readAllMessages();
+        // parseExpenses
+        parseExpenses();
     }
 
-    private void readAllMessages() {
-        List<Sms> smssList = new ArrayList<Sms>();
-        Sms sms;
+    private void parseExpenses() {
         Cursor cursor = getContentResolver().query(Uri.parse("content://sms/inbox"), PROJECTION, SELECTION_CLAUSE, SELECTION_ARGS, SORT_ORDER);
         if (cursor.moveToFirst()) {
+            expensesList = new ArrayList<Expense>(cursor.getCount());
             do {
-                sms = new Sms();
+                Sms sms = new Sms();
 //                sms.set_id(cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_ID)));
                 sms.setDate((cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_DATE))));
                 sms.setBody((cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_BODY))));
 
                 Log.v(TAG, "SMS read " + sms);
-                smssList.add(sms);
+                expensesList.add(new Expense(sms));
             } while (cursor.moveToNext());
+            cursor.close();
 
-            mMessagesTextView.setText(smssList.toString());
+            // Print out the list of expenses
+            mMessagesTextView.setText(expensesList.toString());
         } else {
             Log.v(TAG, "The user does not have any sms");
             mMessagesTextView.setText("The user does not have any sms");
         }
     }
-
 }
