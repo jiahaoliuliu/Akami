@@ -60,13 +60,23 @@ public class MainActivity extends AppCompatActivity {
         if (cursor.moveToFirst()) {
             expensesList = new ArrayList<Expense>(cursor.getCount());
             do {
-                Sms sms = new Sms();
-//                sms.set_id(cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_ID)));
-                sms.setDate((cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_DATE))));
-                sms.setBody((cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_BODY))));
+                try {
+                    Sms sms = new Sms();
+                    //                sms.set_id(cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_ID)));
+                    sms.setDate((cursor.getLong(cursor.getColumnIndexOrThrow(Sms.COLUMN_DATE))));
+                    sms.setBody((cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_BODY))));
 
-                Log.v(TAG, "SMS read " + sms);
-                expensesList.add(new Expense(sms));
+                    //                Log.v(TAG, "SMS read " + sms);
+                    try {
+                        Expense expense = new Expense(sms);
+                        Log.v(TAG, "Expense parsed " + expense);
+                        expensesList.add(expense);
+                    } catch (IllegalArgumentException illegalArgumentException) {
+                        Log.w(TAG, "Expense unknown " + illegalArgumentException.getMessage());
+                    }
+                } catch (IllegalArgumentException illegalArgumentException) {
+                    Log.w(TAG, "Error getting sms message from content resolver ", illegalArgumentException);
+                }
             } while (cursor.moveToNext());
             cursor.close();
 

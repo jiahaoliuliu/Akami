@@ -53,11 +53,10 @@ public class Company {
 
         Company company = (Company) o;
 
-        if (getImageResourceId() != company.getImageResourceId()) return false;
         if (getId() != null ? !getId().equals(company.getId()) : company.getId() != null)
             return false;
-        return getName() != null ? getName().equals(company.getName()) : company.getName() == null;
 
+        return true;
     }
 
     @Override

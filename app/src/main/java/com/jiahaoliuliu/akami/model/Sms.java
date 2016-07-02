@@ -1,5 +1,7 @@
 package com.jiahaoliuliu.akami.model;
 
+import java.util.Date;
+
 /**
  * Created by jiahaoliuliu on 7/1/16.
  */
@@ -13,7 +15,7 @@ public class Sms {
 
     // Fields
 //    private String _id;
-    private String date;
+    private Date date;
     private String body;
 
 //    public String get_id() {
@@ -24,12 +26,17 @@ public class Sms {
 //        this._id = _id;
 //    }
 
-    public String getDate() {
+
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
+    }
+
+    public void setDate(Long date) {
+        this.date = new Date(date);
     }
 
     public String getBody() {
@@ -47,7 +54,6 @@ public class Sms {
 
         Sms sms = (Sms) o;
 
-//        if (get_id() != null ? !get_id().equals(sms.get_id()) : sms.get_id() != null) return false;
         if (getDate() != null ? !getDate().equals(sms.getDate()) : sms.getDate() != null)
             return false;
         return getBody() != null ? getBody().equals(sms.getBody()) : sms.getBody() == null;
@@ -56,7 +62,6 @@ public class Sms {
 
     @Override
     public int hashCode() {
-//        int result = get_id() != null ? get_id().hashCode() : 0;
         int result = getDate() != null ? getDate().hashCode() : 0;
         result = 31 * result + (getBody() != null ? getBody().hashCode() : 0);
         return result;
@@ -65,8 +70,7 @@ public class Sms {
     @Override
     public String toString() {
         return "Sms{" +
-//                "_id='" + _id + '\'' +
-                ", date='" + date + '\'' +
+                "date=" + date +
                 ", body='" + body + '\'' +
                 '}';
     }
