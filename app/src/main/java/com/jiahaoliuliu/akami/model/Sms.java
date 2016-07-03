@@ -1,11 +1,40 @@
 package com.jiahaoliuliu.akami.model;
 
+import android.text.TextUtils;
+import android.util.Log;
+
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by jiahaoliuliu on 7/1/16.
  */
 public class Sms {
+
+    private static final String TAG = "Sms";
+
+    /**
+     * The type of SMS
+     */
+    public enum Type {
+        EXPENSE_1("A purchase transaction of (.*?) has been performed on your Credit Card (.*?) on (.*?) at (.*?) \\."),
+        EXPENSE_2("Purchase transaction of (.*?) performed on your Credit Card (.*?) on (.*?) at (.*?)\\."),
+
+        UNKNOWN("^$");
+
+//        EXPENSE_2;
+
+        private String mRegExpression;
+
+        Type(String regExpression) {
+            this.mRegExpression = regExpression;
+        }
+
+        public String getRegExpression() {
+            return mRegExpression;
+        }
+    }
 
 //    public static final String COLUMN_ID = "_id";
     public static final String COLUMN_ADDRESS = "address";
@@ -17,6 +46,7 @@ public class Sms {
 //    private String _id;
     private Date date;
     private String body;
+    private Type type = Type.UNKNOWN;
 
 //    public String get_id() {
 //        return _id;
@@ -25,7 +55,6 @@ public class Sms {
 //    public void set_id(String _id) {
 //        this._id = _id;
 //    }
-
 
     public Date getDate() {
         return date;
@@ -45,6 +74,26 @@ public class Sms {
 
     public void setBody(String body) {
         this.body = body;
+
+        // Set the sms type
+        if (TextUtils.isEmpty(body)) {
+            Log.e(TAG, "The body of the sms is empty");
+            return;
+        }
+
+        // Go through the list of types to see which one matches
+        for (Type type : Type.values()) {
+            Pattern pattern = Pattern.compile(type.getRegExpression());
+            Matcher matcher = pattern.matcher(body);
+            if (matcher.find()) {
+                this.type = type;
+                break;
+            }
+        }
+    }
+
+    public Type getType() {
+        return type;
     }
 
     @Override

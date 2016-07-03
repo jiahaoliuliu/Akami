@@ -14,11 +14,11 @@ import java.util.regex.Pattern;
 public class Expense {
 
     private static final String TAG = "Expense";
-    private static final String REG_EXP_EXPENSE_1 = "A purchase transaction of AED(.*?) has been performed on your Credit Card (.*?) on (.*?) at (.*?) . ";
 
     private static final String DATE_FORMAT = "dd/MM/yyyy HH:mm:ss";
 
-    private SimpleDateFormat simpleDateFormatter;
+    // Static variables for parsing. Since the parsing is done in each expense, it does make sense to have them as static
+    private static final SimpleDateFormat simpleDateFormatter = new SimpleDateFormat(DATE_FORMAT);
 
     // TODO: Set colour
     public enum ExpenseType {
@@ -31,7 +31,7 @@ public class Expense {
 
     private Date date;
 
-    private float quantity;
+    private String quantity;
 
     private String creditCard;
 
@@ -40,25 +40,38 @@ public class Expense {
     // The constructor which creates expense from the sms
     //
     public Expense(Sms sms) {
-//        Log.v(TAG, "parsing sms " + sms);
-        Pattern patternExpense1 = Pattern.compile(REG_EXP_EXPENSE_1);
-        Matcher matcherExpense1 = patternExpense1.matcher(sms.getBody());
-        if (matcherExpense1.find()) {
-            // Get the first expense
-            this.quantity = Float.parseFloat(matcherExpense1.group(1));
-            this.creditCard = matcherExpense1.group(2);
-            this.simpleDateFormatter = new SimpleDateFormat(DATE_FORMAT);
-            try {
-                this.date = simpleDateFormatter.parse(matcherExpense1.group(3));
-            } catch (ParseException parseException) {
-                // Use the date of the message instead
-                this.date = sms.getDate();
-            }
-            this.companyId = matcherExpense1.group(4);
-            this.expenseType = ExpenseType.EXPENSE;
-        } else {
-            throw new IllegalArgumentException("Unknown expense: " + sms.getBody());
+        switch (sms.getType()) {
+            case EXPENSE_1:
+                parseRegExpExpense(sms);
+                break;
+            case EXPENSE_2:
+                parseRegExpExpense(sms);
+                break;
+            case UNKNOWN:
+            default:
+                throw new IllegalArgumentException("The sms type is unknown");
         }
+    }
+
+    // Other methods
+    private void parseRegExpExpense(Sms sms) {
+        Pattern pattern = Pattern.compile(sms.getType().getRegExpression());
+        Matcher mather = pattern.matcher(sms.getBody());
+        if (!mather.find()) {
+            throw new IllegalArgumentException("The type of the sms suppose to be expense 1 but it does not matches");
+        }
+
+        // Get the first expense
+        this.quantity = mather.group(1);
+        this.creditCard = mather.group(2);
+        try {
+            this.date = simpleDateFormatter.parse(mather.group(3));
+        } catch (ParseException parseException) {
+            // Use the date of the message instead
+            this.date = sms.getDate();
+        }
+        this.companyId = mather.group(4);
+        this.expenseType = ExpenseType.EXPENSE;
     }
 
     public ExpenseType getExpenseType() {
@@ -69,7 +82,7 @@ public class Expense {
         return date;
     }
 
-    public float getQuantity() {
+    public String getQuantity() {
         return quantity;
     }
 
@@ -88,9 +101,12 @@ public class Expense {
 
         Expense expense = (Expense) o;
 
-        if (Float.compare(expense.getQuantity(), getQuantity()) != 0) return false;
+        if (simpleDateFormatter != null ? !simpleDateFormatter.equals(expense.simpleDateFormatter) : expense.simpleDateFormatter != null)
+            return false;
         if (getExpenseType() != expense.getExpenseType()) return false;
         if (getDate() != null ? !getDate().equals(expense.getDate()) : expense.getDate() != null)
+            return false;
+        if (getQuantity() != null ? !getQuantity().equals(expense.getQuantity()) : expense.getQuantity() != null)
             return false;
         if (getCreditCard() != null ? !getCreditCard().equals(expense.getCreditCard()) : expense.getCreditCard() != null)
             return false;
@@ -100,9 +116,10 @@ public class Expense {
 
     @Override
     public int hashCode() {
-        int result = getExpenseType() != null ? getExpenseType().hashCode() : 0;
+        int result = simpleDateFormatter != null ? simpleDateFormatter.hashCode() : 0;
+        result = 31 * result + (getExpenseType() != null ? getExpenseType().hashCode() : 0);
         result = 31 * result + (getDate() != null ? getDate().hashCode() : 0);
-        result = 31 * result + (getQuantity() != +0.0f ? Float.floatToIntBits(getQuantity()) : 0);
+        result = 31 * result + (getQuantity() != null ? getQuantity().hashCode() : 0);
         result = 31 * result + (getCreditCard() != null ? getCreditCard().hashCode() : 0);
         result = 31 * result + (getCompanyId() != null ? getCompanyId().hashCode() : 0);
         return result;

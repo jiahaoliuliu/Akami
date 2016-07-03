@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
                     //                Log.v(TAG, "SMS read " + sms);
                     try {
                         Expense expense = new Expense(sms);
+                        Log.v(TAG, "SMS " + sms);
                         Log.v(TAG, "Expense parsed " + expense);
                         expensesList.add(expense);
                     } catch (IllegalArgumentException illegalArgumentException) {
