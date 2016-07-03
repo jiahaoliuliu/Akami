@@ -42,8 +42,6 @@ public class Expense {
     public Expense(Sms sms) {
         switch (sms.getType()) {
             case EXPENSE_1:
-                parseRegExpExpense(sms);
-                break;
             case EXPENSE_2:
                 parseRegExpExpense(sms);
                 break;
