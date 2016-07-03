@@ -69,12 +69,13 @@ public class MainActivity extends AppCompatActivity {
                     //                Log.v(TAG, "SMS read " + sms);
                     try {
                         Expense expense = new Expense(sms);
-                        Log.v(TAG, "SMS " + sms);
-                        Log.v(TAG, "Expense parsed " + expense);
+//                        Log.v(TAG, "SMS " + sms);
+//                        Log.v(TAG, "Expense parsed " + expense);
                         expensesList.add(expense);
                     } catch (IllegalArgumentException illegalArgumentException) {
                         Log.w(TAG, "Expense unknown " + illegalArgumentException.getMessage());
                     }
+                // To catch any error on Getting the data from the cursor
                 } catch (IllegalArgumentException illegalArgumentException) {
                     Log.w(TAG, "Error getting sms message from content resolver ", illegalArgumentException);
                 }

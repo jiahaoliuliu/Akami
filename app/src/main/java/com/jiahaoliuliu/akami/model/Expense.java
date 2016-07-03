@@ -24,7 +24,8 @@ public class Expense {
     public enum ExpenseType {
         EXPENSE,
         WITHDRAW,
-        SALARY
+        SALARY,
+        PAYMENT
     }
 
     private ExpenseType expenseType;
@@ -47,7 +48,7 @@ public class Expense {
                 break;
             case UNKNOWN:
             default:
-                throw new IllegalArgumentException("The sms type is unknown");
+                throw new IllegalArgumentException("The sms type is unknown " + sms);
         }
     }
 
