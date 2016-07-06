@@ -21,6 +21,7 @@ public class Expense {
     private static final SimpleDateFormat simpleDateFormatter = new SimpleDateFormat(DATE_FORMAT);
 
     // TODO: Set colour
+    // TODO: Create the super class Transactions which contains the follwo classes
     public enum ExpenseType {
         EXPENSE,
         WITHDRAW,

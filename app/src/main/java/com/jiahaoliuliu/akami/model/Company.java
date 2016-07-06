@@ -16,10 +16,9 @@ public class Company {
     // The id of the image in the res folder
     private int imageResourceId;
 
-    public Company(String id, String name, int imageResourceId) {
+    public Company(String id, String name) {
         this.id = id;
         this.name = name;
-        this.imageResourceId = imageResourceId;
     }
 
     public String getId() {
