@@ -10,6 +10,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import com.jiahaoliuliu.akami.R;
@@ -17,7 +18,9 @@ import com.jiahaoliuliu.akami.model.Company;
 import com.jiahaoliuliu.akami.model.Expense;
 import com.jiahaoliuliu.akami.model.Sms;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +29,9 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
     private static final String ADDRESS_ADCB = "ADCBAlert";
+
+    // Date to be displayed as header
+    private static final String HEADER_DATE_FORMAT = "MMMM yyyy";
 
     // Projection. The fields of the sms to be returned
     private static final String[] PROJECTION = {
@@ -44,6 +50,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String SORT_ORDER = Sms.COLUMN_DATE + " DESC";
 
     // Views
+    private TextView mHeaderDateTextView;
+    private TextView mHeaderExpensesTextView;
     private RecyclerView mExpensesRecyclerView;
 
     // Internal variables
@@ -51,10 +59,18 @@ public class MainActivity extends AppCompatActivity {
 
     private List<Expense> mExpensesList;
     private ExpensesListAdapter mExpensesListAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
+    private LinearLayoutManager mLinearLayoutManager;
+
+    // The expenses per month
+    private Map<Long, Float> mExpensesPerMonth;
 
     // The list of companies
     private Map<String, Company> mCompaniesMap;
+
+    // The header date formatter
+    private SimpleDateFormat mHeaderDateFormatter;
+    // The month of the first element shown in the header
+    private long mFirstElementMonthlyKey;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,12 +79,16 @@ public class MainActivity extends AppCompatActivity {
 
         // Set variables
         this.mContext = this;
+        mHeaderDateFormatter = new SimpleDateFormat(HEADER_DATE_FORMAT);
 
         // Link the views
+        mHeaderDateTextView = (TextView) findViewById(R.id.header_date_text_view);
+        mHeaderExpensesTextView = (TextView) findViewById(R.id.header_expenses_text_view);
+
         mExpensesRecyclerView = (RecyclerView) findViewById(R.id.expenses_recycler_view);
         mExpensesRecyclerView.setHasFixedSize(true);
-        mLayoutManager = new LinearLayoutManager(this);
-        mExpensesRecyclerView.setLayoutManager(mLayoutManager);
+        mLinearLayoutManager = new LinearLayoutManager(this);
+        mExpensesRecyclerView.setLayoutManager(mLinearLayoutManager);
 
         // Create the list of companies
         mCompaniesMap = generateComapniesList();
@@ -91,9 +111,8 @@ public class MainActivity extends AppCompatActivity {
                     //                Log.v(TAG, "SMS read " + sms);
                     try {
                         Expense expense = new Expense(sms);
-//                        Log.v(TAG, "SMS " + sms);
-                        Log.v(TAG, "Expense parsed " + expense);
                         mExpensesList.add(expense);
+                        updateExpensePerMonth(expense);
                     } catch (IllegalArgumentException illegalArgumentException) {
 //                        Log.w(TAG, "Expense unknown " + illegalArgumentException.getMessage());
                     }
@@ -106,9 +125,56 @@ public class MainActivity extends AppCompatActivity {
 
             mExpensesListAdapter = new ExpensesListAdapter(mContext, mExpensesList, mCompaniesMap);
             mExpensesRecyclerView.setAdapter(mExpensesListAdapter);
+            mExpensesRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener(){
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                    int firstElementPosition = mLinearLayoutManager.findFirstVisibleItemPosition();
+                    Expense firstExpense = mExpensesList.get(firstElementPosition);
+
+                    // Update the header if needed
+                    long currentMonthlyKey = getHeaderMonthlyKeyByExpense(firstExpense);
+                    if (currentMonthlyKey != mFirstElementMonthlyKey) {
+                        // Update the month
+                        mHeaderDateTextView.setText(mHeaderDateFormatter.format(firstExpense.getDate()));
+
+                        // Update the expenses
+                        mFirstElementMonthlyKey = currentMonthlyKey;
+                        mHeaderExpensesTextView.setText(String.format("%.02f", mExpensesPerMonth.get(mFirstElementMonthlyKey)));
+                    }
+                }
+            });
         } else {
             Log.v(TAG, "The user does not have any sms");
         }
+    }
+
+    private void updateExpensePerMonth(Expense expense) {
+        // Intialize expense per month if needed
+        if (mExpensesPerMonth == null) {
+            mExpensesPerMonth = new HashMap<>();
+        }
+
+        long key = getHeaderMonthlyKeyByExpense(expense);
+
+        if (!mExpensesPerMonth.containsKey(key)) {
+            mExpensesPerMonth.put(key, 0.00f);
+        } else {
+            float monthExpense = mExpensesPerMonth.get(key);
+            monthExpense += expense.getQuantity();
+            mExpensesPerMonth.put(key, monthExpense);
+        }
+    }
+
+    private long getHeaderMonthlyKeyByExpense(Expense expense) {
+        // Generate the key
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(expense.getDate());
+        calendar.set(Calendar.DAY_OF_MONTH, 0);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        return calendar.getTimeInMillis();
     }
 
     // TODO: Use database instead
@@ -234,6 +300,5 @@ public class MainActivity extends AppCompatActivity {
 
         return companiesMap;
     }
-
 
 }

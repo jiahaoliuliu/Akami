@@ -33,7 +33,7 @@ public class Expense {
 
     private Date date;
 
-    private String quantity;
+    private float quantity;
 
     private String creditCard;
 
@@ -56,21 +56,25 @@ public class Expense {
     // Other methods
     private void parseRegExpExpense(Sms sms) {
         Pattern pattern = Pattern.compile(sms.getType().getRegExpression());
-        Matcher mather = pattern.matcher(sms.getBody());
-        if (!mather.find()) {
+        Matcher matcher = pattern.matcher(sms.getBody());
+        if (!matcher.find()) {
             throw new IllegalArgumentException("The type of the sms suppose to be expense 1 but it does not matches");
         }
 
         // Get the first expense
-        this.quantity = mather.group(1);
-        this.creditCard = mather.group(2);
         try {
-            this.date = simpleDateFormatter.parse(mather.group(3));
+            this.quantity = Float.valueOf(matcher.group(1));
+        } catch (NumberFormatException numberFormatException) {
+            throw new IllegalArgumentException("The value of quantity is not correct: " + matcher.group(1));
+        }
+        this.creditCard = matcher.group(2);
+        try {
+            this.date = simpleDateFormatter.parse(matcher.group(3));
         } catch (ParseException parseException) {
             // Use the date of the message instead
             this.date = sms.getDate();
         }
-        this.companyId = mather.group(4);
+        this.companyId = matcher.group(4);
         this.expenseType = ExpenseType.EXPENSE;
     }
 
@@ -82,7 +86,7 @@ public class Expense {
         return date;
     }
 
-    public String getQuantity() {
+    public float getQuantity() {
         return quantity;
     }
 
@@ -101,12 +105,9 @@ public class Expense {
 
         Expense expense = (Expense) o;
 
-        if (simpleDateFormatter != null ? !simpleDateFormatter.equals(expense.simpleDateFormatter) : expense.simpleDateFormatter != null)
-            return false;
+        if (Float.compare(expense.getQuantity(), getQuantity()) != 0) return false;
         if (getExpenseType() != expense.getExpenseType()) return false;
         if (getDate() != null ? !getDate().equals(expense.getDate()) : expense.getDate() != null)
-            return false;
-        if (getQuantity() != null ? !getQuantity().equals(expense.getQuantity()) : expense.getQuantity() != null)
             return false;
         if (getCreditCard() != null ? !getCreditCard().equals(expense.getCreditCard()) : expense.getCreditCard() != null)
             return false;
@@ -116,10 +117,9 @@ public class Expense {
 
     @Override
     public int hashCode() {
-        int result = simpleDateFormatter != null ? simpleDateFormatter.hashCode() : 0;
-        result = 31 * result + (getExpenseType() != null ? getExpenseType().hashCode() : 0);
+        int result = getExpenseType() != null ? getExpenseType().hashCode() : 0;
         result = 31 * result + (getDate() != null ? getDate().hashCode() : 0);
-        result = 31 * result + (getQuantity() != null ? getQuantity().hashCode() : 0);
+        result = 31 * result + (getQuantity() != +0.0f ? Float.floatToIntBits(getQuantity()) : 0);
         result = 31 * result + (getCreditCard() != null ? getCreditCard().hashCode() : 0);
         result = 31 * result + (getCompanyId() != null ? getCompanyId().hashCode() : 0);
         return result;
