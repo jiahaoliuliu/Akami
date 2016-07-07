@@ -140,7 +140,8 @@ public class MainActivity extends AppCompatActivity {
 
                         // Update the expenses
                         mFirstElementMonthlyKey = currentMonthlyKey;
-                        mHeaderExpensesTextView.setText(String.format("%.02f", mExpensesPerMonth.get(mFirstElementMonthlyKey)));
+                        mHeaderExpensesTextView.setText(String.format("%.02f", mExpensesPerMonth.get(mFirstElementMonthlyKey))
+                                    + " " + getResources().getString(R.string.currency_aed));
                     }
                 }
             });
