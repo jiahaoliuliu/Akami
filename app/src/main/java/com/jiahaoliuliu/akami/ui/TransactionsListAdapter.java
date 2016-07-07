@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.jiahaoliuliu.akami.R;
 import com.jiahaoliuliu.akami.model.Company;
 import com.jiahaoliuliu.akami.model.ITransactions;
+import com.jiahaoliuliu.akami.model.Withdraw;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -57,40 +58,40 @@ public class TransactionsListAdapter extends RecyclerView.Adapter<TransactionsLi
         switch (transaction.getType()) {
             case EXPENSE:
                 companyId = transaction.getDestination();
+                if (mCompaniesMap.containsKey(companyId)) {
+                    Company company = mCompaniesMap.get(companyId);
+                    holder.mSourceTextView.setText(company.getName());
+
+                    int sourceLogoId = company.getImageResourceId();
+                    if (sourceLogoId != 0) {
+                        holder.mSourceLogoImageView.setImageDrawable(mContext.getResources().getDrawable(sourceLogoId));
+                        holder.mSourceLogoImageView.setVisibility(View.VISIBLE);
+                    } else {
+                        holder.mSourceLogoImageView.setVisibility(View.INVISIBLE);
+                    }
+
+                } else {
+                    Log.v(TAG, "Source unknown \"" + companyId + "\"");
+
+                    // TODO: Trying to guess the company the name name
+
+                    // Set the first character as capital letter
+                    if (!TextUtils.isEmpty(companyId)) {
+                        String sourceNameFormatted = companyId.substring(0, 1).toUpperCase() + companyId.substring(1).toLowerCase();
+                        holder.mSourceTextView.setText(sourceNameFormatted);
+                    }
+
+                    // Hide the company logo
+                    holder.mSourceLogoImageView.setVisibility(View.INVISIBLE);
+                }
                 break;
             case WITHDRAW:
                 // Get the branch
-                companyId = transaction.getDestination();
+                holder.mSourceTextView.setText(Withdraw.WITHDRAW_TITLE);
+                holder.mSourceLogoImageView.setImageDrawable(mContext.getResources().getDrawable(R.drawable.logo_adcb));
+                holder.mSourceLogoImageView.setVisibility(View.VISIBLE);
                 break;
         }
-
-        if (mCompaniesMap.containsKey(companyId)) {
-            Company company = mCompaniesMap.get(companyId);
-            holder.mSourceTextView.setText(company.getName());
-
-            int sourceLogoId = company.getImageResourceId();
-            if (sourceLogoId != 0) {
-                holder.mSourceLogoImageView.setImageDrawable(mContext.getResources().getDrawable(sourceLogoId));
-                holder.mSourceLogoImageView.setVisibility(View.VISIBLE);
-            } else {
-                holder.mSourceLogoImageView.setVisibility(View.INVISIBLE);
-            }
-
-        } else {
-            Log.v(TAG, "Source unknown \"" + companyId + "\"");
-
-            // TODO: Trying to guess the company the name name
-
-            // Set the first character as capital letter
-            if (!TextUtils.isEmpty(companyId)) {
-                String sourceNameFormatted = companyId.substring(0, 1).toUpperCase() + companyId.substring(1).toLowerCase();
-                holder.mSourceTextView.setText(sourceNameFormatted);
-            }
-
-            // Hide the company logo
-            holder.mSourceLogoImageView.setVisibility(View.INVISIBLE);
-        }
-
         holder.mQuantityTextView.setText(transaction.getQuantity() + " " + mContext.getResources().getString(R.string.currency_aed));
         holder.mDateTextView.setText(mSimpleDateFormatter.format(transaction.getDate()));
     }
