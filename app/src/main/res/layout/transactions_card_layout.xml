@@ -25,12 +25,12 @@
             android:layout_height="wrap_content"
             >
 
-            <!-- Company name -->
+            <!-- Source -->
             <TextView
-                android:id="@+id/company_name_text_view"
+                android:id="@+id/source_text_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_toLeftOf="@+id/logo_image_view"
+                android:layout_toLeftOf="@+id/source_logo_image_view"
                 android:textSize="@dimen/expense_list_title_size"
                 android:text="Company name"
                 android:layout_alignParentLeft="true"
@@ -41,7 +41,7 @@
 
             <!-- Logo -->
             <ImageView
-                android:id="@+id/logo_image_view"
+                android:id="@+id/source_logo_image_view"
                 android:layout_width="@dimen/expense_list_logo"
                 android:layout_height="@dimen/expense_list_logo"
                 android:adjustViewBounds="true"
@@ -52,19 +52,19 @@
                 android:src="@drawable/logo_spinneys"
                 />
 
-            <!-- Expense -->
+            <!-- Quantity -->
             <TextView
-                android:id="@+id/expense_text_view"
+                android:id="@+id/quantity_text_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/company_name_text_view"
+                android:layout_below="@+id/source_text_view"
                 android:layout_marginTop="5dp"
-                android:layout_toLeftOf="@+id/logo_image_view"
+                android:layout_toLeftOf="@+id/source_logo_image_view"
                 android:layout_marginRight="5dp"
                 android:maxLines="1"
                 android:singleLine="true"
                 android:layout_alignBottom="@+id/date_text_view"
-                android:text="expenses"
+                android:text="transaction"
                 android:gravity="bottom"
                 android:textSize="@dimen/expense_list_expense_size"
                 />
@@ -74,7 +74,7 @@
                 android:id="@+id/date_text_view"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                android:layout_below="@+id/logo_image_view"
+                android:layout_below="@+id/source_logo_image_view"
                 android:layout_alignParentRight="true"
                 android:gravity="center|bottom"
                 android:text="date"

@@ -3,19 +3,18 @@ package com.jiahaoliuliu.akami.ui;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.provider.Telephony;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.widget.TextView;
 
 import com.jiahaoliuliu.akami.R;
 import com.jiahaoliuliu.akami.model.Company;
 import com.jiahaoliuliu.akami.model.Expense;
 import com.jiahaoliuliu.akami.model.Sms;
+import com.jiahaoliuliu.akami.model.ITransactions;
+import com.jiahaoliuliu.akami.model.Withdraw;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,13 +43,13 @@ public class MainActivity extends AppCompatActivity {
     private static final String SORT_ORDER = Sms.COLUMN_DATE + " DESC";
 
     // Views
-    private RecyclerView mExpensesRecyclerView;
+    private RecyclerView mTransactionsRecyclerView;
 
     // Internal variables
     private Context mContext;
 
-    private List<Expense> mExpensesList;
-    private ExpensesListAdapter mExpensesListAdapter;
+    private List<ITransactions> mTransactionsList;
+    private TransactionsListAdapter mTransactionsListAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
     // The list of companies
@@ -65,10 +64,10 @@ public class MainActivity extends AppCompatActivity {
         this.mContext = this;
 
         // Link the views
-        mExpensesRecyclerView = (RecyclerView) findViewById(R.id.expenses_recycler_view);
-        mExpensesRecyclerView.setHasFixedSize(true);
+        mTransactionsRecyclerView = (RecyclerView) findViewById(R.id.transactions_recycler_view);
+        mTransactionsRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(this);
-        mExpensesRecyclerView.setLayoutManager(mLayoutManager);
+        mTransactionsRecyclerView.setLayoutManager(mLayoutManager);
 
         // Create the list of companies
         mCompaniesMap = generateComapniesList();
@@ -80,22 +79,33 @@ public class MainActivity extends AppCompatActivity {
     private void parseExpenses() {
         Cursor cursor = getContentResolver().query(Uri.parse("content://sms/inbox"), PROJECTION, SELECTION_CLAUSE, SELECTION_ARGS, SORT_ORDER);
         if (cursor.moveToFirst()) {
-            mExpensesList = new ArrayList<Expense>(cursor.getCount());
+            mTransactionsList = new ArrayList<ITransactions>(cursor.getCount());
             do {
                 try {
                     Sms sms = new Sms();
                     //                sms.set_id(cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_ID)));
                     sms.setDate((cursor.getLong(cursor.getColumnIndexOrThrow(Sms.COLUMN_DATE))));
                     sms.setBody((cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_BODY))));
-
-                    //                Log.v(TAG, "SMS read " + sms);
+//                    Log.v(TAG, "SMS " + sms);
                     try {
-                        Expense expense = new Expense(sms);
-//                        Log.v(TAG, "SMS " + sms);
-                        Log.v(TAG, "Expense parsed " + expense);
-                        mExpensesList.add(expense);
+                        switch (sms.getType()) {
+                            case EXPENSE_1:
+                            case EXPENSE_2:
+                                Expense expense = new Expense(sms);
+                                mTransactionsList.add(expense);
+//                                Log.v(TAG, "transaction parsed " + expense);
+                                break;
+                            case WITHDRAW:
+                                Withdraw withdraw = new Withdraw(sms);
+//                                Log.v(TAG, "Withdraw parsed " + withdraw);
+                                mTransactionsList.add(withdraw);
+                                break;
+                            case UNKNOWN:
+                                Log.w(TAG, "Sms unknown " + sms.getBody());
+                                break;
+                        }
                     } catch (IllegalArgumentException illegalArgumentException) {
-//                        Log.w(TAG, "Expense unknown " + illegalArgumentException.getMessage());
+                        Log.w(TAG, "transaction unknown " + illegalArgumentException.getMessage());
                     }
                 // To catch any error on Getting the data from the cursor
                 } catch (IllegalArgumentException illegalArgumentException) {
@@ -104,8 +114,8 @@ public class MainActivity extends AppCompatActivity {
             } while (cursor.moveToNext());
             cursor.close();
 
-            mExpensesListAdapter = new ExpensesListAdapter(mContext, mExpensesList, mCompaniesMap);
-            mExpensesRecyclerView.setAdapter(mExpensesListAdapter);
+            mTransactionsListAdapter = new TransactionsListAdapter(mContext, mTransactionsList, mCompaniesMap);
+            mTransactionsRecyclerView.setAdapter(mTransactionsListAdapter);
         } else {
             Log.v(TAG, "The user does not have any sms");
         }

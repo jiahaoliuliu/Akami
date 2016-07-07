@@ -1,5 +1,7 @@
 package com.jiahaoliuliu.akami.model;
 
+import android.util.Log;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -7,13 +9,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created by jiahaoliuliu on 7/2/16.
+ * Model created to contain Withdraws. This is an example:
+ * - AED 4200.00 withdrawn from acc. XXX132001 on Feb  1 2015  6:32PM at ATM-CBD ATM MARINA BR 2501.
+ *   Avail.Bal.AED12283.31.Exercise caution with large amount of cash.Visit www.adcb.com/mobileapp to
+ *   download the ADCB Mobile Banking App.
+ * Created by jiahaoliuliu on 7/7/16.
  */
-public class Expense implements ITransactions {
+public class Withdraw implements ITransactions {
 
-    private static final String TAG = "Expense";
+    private static final String TAG = "Withdraw";
 
-    private static final String DATE_FORMAT = "dd/MM/yyyy HH:mm:ss";
+    private static final String DATE_FORMAT = "MMM dd yyyy HH:mmaa";
 
     // Static variables for parsing. Since the parsing is done in each expense, it does make sense to have them as static
     private static final SimpleDateFormat simpleDateFormatter = new SimpleDateFormat(DATE_FORMAT);
@@ -22,15 +28,15 @@ public class Expense implements ITransactions {
 
     private float quantity;
 
-    private String creditCard;
+    private String account;
 
-    private String companyId;
+    // When the app is able to parse more than one bank, add the field bank
+    private String branch;
 
     // The constructor which creates expense from the sms
-    public Expense(Sms sms) {
+    public Withdraw(Sms sms) {
         switch (sms.getType()) {
-            case EXPENSE_1:
-            case EXPENSE_2:
+            case WITHDRAW:
                 parseSms(sms);
                 break;
             case UNKNOWN:
@@ -54,19 +60,20 @@ public class Expense implements ITransactions {
             throw new IllegalArgumentException("Error parsing the quantity " + matcher.group(1));
         }
 
-        this.creditCard = matcher.group(2);
+        this.account = matcher.group(2);
         try {
             this.date = simpleDateFormatter.parse(matcher.group(3));
         } catch (ParseException parseException) {
             // Use the date of the message instead
+            Log.w(TAG, "Error parsing the date \"" + matcher.group(3) + "\"");
             this.date = sms.getDate();
         }
-        this.companyId = matcher.group(4);
+        this.branch = matcher.group(4);
     }
 
     @Override
     public Type getType() {
-        return Type.EXPENSE;
+        return Type.WITHDRAW;
     }
 
     @Override
@@ -76,12 +83,12 @@ public class Expense implements ITransactions {
 
     @Override
     public String getSource() {
-        return creditCard;
+        return account;
     }
 
     @Override
     public String getDestination() {
-        return companyId;
+        return branch;
     }
 
     @Override
@@ -94,14 +101,14 @@ public class Expense implements ITransactions {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Expense expense = (Expense) o;
+        Withdraw withdraw = (Withdraw) o;
 
-        if (Float.compare(expense.getQuantity(), getQuantity()) != 0) return false;
-        if (getDate() != null ? !getDate().equals(expense.getDate()) : expense.getDate() != null)
+        if (Float.compare(withdraw.getQuantity(), getQuantity()) != 0) return false;
+        if (getDate() != null ? !getDate().equals(withdraw.getDate()) : withdraw.getDate() != null)
             return false;
-        if (creditCard != null ? !creditCard.equals(expense.creditCard) : expense.creditCard != null)
+        if (account != null ? !account.equals(withdraw.account) : withdraw.account != null)
             return false;
-        return companyId != null ? companyId.equals(expense.companyId) : expense.companyId == null;
+        return branch != null ? branch.equals(withdraw.branch) : withdraw.branch == null;
 
     }
 
@@ -109,18 +116,18 @@ public class Expense implements ITransactions {
     public int hashCode() {
         int result = getDate() != null ? getDate().hashCode() : 0;
         result = 31 * result + (getQuantity() != +0.0f ? Float.floatToIntBits(getQuantity()) : 0);
-        result = 31 * result + (creditCard != null ? creditCard.hashCode() : 0);
-        result = 31 * result + (companyId != null ? companyId.hashCode() : 0);
+        result = 31 * result + (account != null ? account.hashCode() : 0);
+        result = 31 * result + (branch != null ? branch.hashCode() : 0);
         return result;
     }
 
     @Override
     public String toString() {
-        return "Expense{" +
+        return "Withdraw{" +
                 "date=" + date +
                 ", quantity=" + quantity +
-                ", creditCard='" + creditCard + '\'' +
-                ", companyId='" + companyId + '\'' +
+                ", account='" + account + '\'' +
+                ", branch='" + branch + '\'' +
                 '}';
     }
 }
