@@ -113,9 +113,10 @@ public class MainActivity extends AppCompatActivity {
                                 Expense expense = new Expense(sms);
                                 updateTransactionsPerMonth(expense);
                                 mTransactionsList.add(expense);
-//                                Log.v(TAG, "transaction parsed " + expense);
+//                                Log.v(TAG, "Expense parsed " + expense);
                                 break;
-                            case WITHDRAW:
+                            case WITHDRAW_1:
+                            case WITHDRAW_2:
                                 Withdraw withdraw = new Withdraw(sms);
 //                                Log.v(TAG, "Withdraw parsed " + withdraw);
                                 updateTransactionsPerMonth(withdraw);

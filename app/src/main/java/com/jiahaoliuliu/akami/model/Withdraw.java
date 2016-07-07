@@ -13,16 +13,26 @@ import java.util.regex.Pattern;
  * - AED 4200.00 withdrawn from acc. XXX132001 on Feb  1 2015  6:32PM at ATM-CBD ATM MARINA BR 2501.
  *   Avail.Bal.AED12283.31.Exercise caution with large amount of cash.Visit www.adcb.com/mobileapp to
  *   download the ADCB Mobile Banking App.
+<<<<<<< HEAD
+=======
+ * - AED200.00 was withdrawn from your Credit Card XXX4921 on 25/05/2015 21:04:56  at ADIB METRO DIC DXB,DUBAI-AE.
+ *   Available credit limit is now AED 32655.38
+>>>>>>> feature/parseWithDraws
  * Created by jiahaoliuliu on 7/7/16.
  */
 public class Withdraw implements ITransactions {
 
+    public static final String WITHDRAW_TITLE = "Withdraw";
+
     private static final String TAG = "Withdraw";
 
-    private static final String DATE_FORMAT = "MMM dd yyyy HH:mmaa";
+    private static final String DATE_FORMAT_WITHDRAW_1 = "MMM dd yyyy HH:mmaa";
+
+    private static final String DATE_FORMAT_WITHDRAW_2 = "dd/MM/yyyy HH:mm:ss";
 
     // Static variables for parsing. Since the parsing is done in each expense, it does make sense to have them as static
-    private static final SimpleDateFormat simpleDateFormatter = new SimpleDateFormat(DATE_FORMAT);
+    private static final SimpleDateFormat DATE_FORMATTER_WITHDRAW_1 = new SimpleDateFormat(DATE_FORMAT_WITHDRAW_1);
+    private static final SimpleDateFormat DATE_FORMATTER_WITHDRAW_2 = new SimpleDateFormat(DATE_FORMAT_WITHDRAW_2);
 
     private Date date;
 
@@ -36,8 +46,12 @@ public class Withdraw implements ITransactions {
     // The constructor which creates expense from the sms
     public Withdraw(Sms sms) {
         switch (sms.getType()) {
-            case WITHDRAW:
-                parseSms(sms);
+            case WITHDRAW_1:
+                parseWithdraw1(sms);
+                break;
+            case WITHDRAW_2:
+                Log.d(TAG, "Parsing withdraw 2 " + sms);
+                parseWithdraw2(sms);
                 break;
             case UNKNOWN:
             default:
@@ -46,7 +60,7 @@ public class Withdraw implements ITransactions {
     }
 
     // Other methods
-    private void parseSms(Sms sms) {
+    private void parseWithdraw1(Sms sms) {
         Pattern pattern = Pattern.compile(sms.getType().getRegExpression());
         Matcher matcher = pattern.matcher(sms.getBody());
         if (!matcher.find()) {
@@ -62,7 +76,32 @@ public class Withdraw implements ITransactions {
 
         this.account = matcher.group(2);
         try {
-            this.date = simpleDateFormatter.parse(matcher.group(3));
+            this.date = DATE_FORMATTER_WITHDRAW_1.parse(matcher.group(3));
+        } catch (ParseException parseException) {
+            // Use the date of the message instead
+            Log.w(TAG, "Error parsing the date \"" + matcher.group(3) + "\"");
+            this.date = sms.getDate();
+        }
+        this.branch = matcher.group(4);
+    }
+
+    private void parseWithdraw2(Sms sms) {
+        Pattern pattern = Pattern.compile(sms.getType().getRegExpression());
+        Matcher matcher = pattern.matcher(sms.getBody());
+        if (!matcher.find()) {
+            throw new IllegalArgumentException("The type of the sms suppose to be expense 1 but it does not matches");
+        }
+
+        // Get the first expense
+        try {
+            this.quantity = Float.parseFloat(matcher.group(1));
+        } catch (NumberFormatException numberFormatException) {
+            throw new IllegalArgumentException("Error parsing the quantity " + matcher.group(1));
+        }
+
+        this.account = matcher.group(2);
+        try {
+            this.date = DATE_FORMATTER_WITHDRAW_2.parse(matcher.group(3));
         } catch (ParseException parseException) {
             // Use the date of the message instead
             Log.w(TAG, "Error parsing the date \"" + matcher.group(3) + "\"");
