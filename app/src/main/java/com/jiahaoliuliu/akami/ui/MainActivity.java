@@ -3,20 +3,19 @@ package com.jiahaoliuliu.akami.ui;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.provider.Telephony;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.view.View;
 import android.widget.TextView;
 
 import com.jiahaoliuliu.akami.R;
 import com.jiahaoliuliu.akami.model.Company;
 import com.jiahaoliuliu.akami.model.Expense;
 import com.jiahaoliuliu.akami.model.Sms;
+import com.jiahaoliuliu.akami.model.ITransactions;
+import com.jiahaoliuliu.akami.model.Withdraw;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -52,17 +51,16 @@ public class MainActivity extends AppCompatActivity {
     // Views
     private TextView mHeaderDateTextView;
     private TextView mHeaderExpensesTextView;
-    private RecyclerView mExpensesRecyclerView;
+    private RecyclerView mTransactionsRecyclerView;
 
     // Internal variables
     private Context mContext;
 
-    private List<Expense> mExpensesList;
-    private ExpensesListAdapter mExpensesListAdapter;
-    private LinearLayoutManager mLinearLayoutManager;
-
     // The expenses per month
     private Map<Long, Float> mExpensesPerMonth;
+    private List<ITransactions> mTransactionsList;
+    private TransactionsListAdapter mTransactionsListAdapter;
+    private LinearLayoutManager mLinearLayoutManager;
 
     // The list of companies
     private Map<String, Company> mCompaniesMap;
@@ -85,10 +83,10 @@ public class MainActivity extends AppCompatActivity {
         mHeaderDateTextView = (TextView) findViewById(R.id.header_date_text_view);
         mHeaderExpensesTextView = (TextView) findViewById(R.id.header_expenses_text_view);
 
-        mExpensesRecyclerView = (RecyclerView) findViewById(R.id.expenses_recycler_view);
-        mExpensesRecyclerView.setHasFixedSize(true);
+        mTransactionsRecyclerView = (RecyclerView) findViewById(R.id.transactions_recycler_view);
+        mTransactionsRecyclerView.setHasFixedSize(true);
         mLinearLayoutManager = new LinearLayoutManager(this);
-        mExpensesRecyclerView.setLayoutManager(mLinearLayoutManager);
+        mTransactionsRecyclerView.setLayoutManager(mLinearLayoutManager);
 
         // Create the list of companies
         mCompaniesMap = generateComapniesList();
@@ -100,21 +98,35 @@ public class MainActivity extends AppCompatActivity {
     private void parseExpenses() {
         Cursor cursor = getContentResolver().query(Uri.parse("content://sms/inbox"), PROJECTION, SELECTION_CLAUSE, SELECTION_ARGS, SORT_ORDER);
         if (cursor.moveToFirst()) {
-            mExpensesList = new ArrayList<Expense>(cursor.getCount());
+            mTransactionsList = new ArrayList<ITransactions>(cursor.getCount());
             do {
                 try {
                     Sms sms = new Sms();
                     //                sms.set_id(cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_ID)));
                     sms.setDate((cursor.getLong(cursor.getColumnIndexOrThrow(Sms.COLUMN_DATE))));
                     sms.setBody((cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_BODY))));
-
-                    //                Log.v(TAG, "SMS read " + sms);
+//                    Log.v(TAG, "SMS " + sms);
                     try {
-                        Expense expense = new Expense(sms);
-                        mExpensesList.add(expense);
-                        updateExpensePerMonth(expense);
+                        switch (sms.getType()) {
+                            case EXPENSE_1:
+                            case EXPENSE_2:
+                                Expense expense = new Expense(sms);
+                                updateTransactionsPerMonth(expense);
+                                mTransactionsList.add(expense);
+//                                Log.v(TAG, "transaction parsed " + expense);
+                                break;
+                            case WITHDRAW:
+                                Withdraw withdraw = new Withdraw(sms);
+//                                Log.v(TAG, "Withdraw parsed " + withdraw);
+                                updateTransactionsPerMonth(withdraw);
+                                mTransactionsList.add(withdraw);
+                                break;
+                            case UNKNOWN:
+                                Log.w(TAG, "Sms unknown " + sms.getBody());
+                                break;
+                        }
                     } catch (IllegalArgumentException illegalArgumentException) {
-//                        Log.w(TAG, "Expense unknown " + illegalArgumentException.getMessage());
+                        Log.w(TAG, "transaction unknown " + illegalArgumentException.getMessage());
                     }
                 // To catch any error on Getting the data from the cursor
                 } catch (IllegalArgumentException illegalArgumentException) {
@@ -123,20 +135,20 @@ public class MainActivity extends AppCompatActivity {
             } while (cursor.moveToNext());
             cursor.close();
 
-            mExpensesListAdapter = new ExpensesListAdapter(mContext, mExpensesList, mCompaniesMap);
-            mExpensesRecyclerView.setAdapter(mExpensesListAdapter);
-            mExpensesRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener(){
+            mTransactionsListAdapter = new TransactionsListAdapter(mContext, mTransactionsList, mCompaniesMap);
+            mTransactionsRecyclerView.setAdapter(mTransactionsListAdapter);
+            mTransactionsRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener(){
                 @Override
                 public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                     super.onScrolled(recyclerView, dx, dy);
                     int firstElementPosition = mLinearLayoutManager.findFirstVisibleItemPosition();
-                    Expense firstExpense = mExpensesList.get(firstElementPosition);
+                    ITransactions firstTransaction = mTransactionsList.get(firstElementPosition);
 
                     // Update the header if needed
-                    long currentMonthlyKey = getHeaderMonthlyKeyByExpense(firstExpense);
+                    long currentMonthlyKey = getHeaderMonthlyKeyByTransaction(firstTransaction);
                     if (currentMonthlyKey != mFirstElementMonthlyKey) {
                         // Update the month
-                        mHeaderDateTextView.setText(mHeaderDateFormatter.format(firstExpense.getDate()));
+                        mHeaderDateTextView.setText(mHeaderDateFormatter.format(firstTransaction.getDate()));
 
                         // Update the expenses
                         mFirstElementMonthlyKey = currentMonthlyKey;
@@ -145,32 +157,34 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             });
+            mTransactionsListAdapter = new TransactionsListAdapter(mContext, mTransactionsList, mCompaniesMap);
+            mTransactionsRecyclerView.setAdapter(mTransactionsListAdapter);
         } else {
             Log.v(TAG, "The user does not have any sms");
         }
     }
 
-    private void updateExpensePerMonth(Expense expense) {
+    private void updateTransactionsPerMonth(ITransactions transaction) {
         // Intialize expense per month if needed
         if (mExpensesPerMonth == null) {
             mExpensesPerMonth = new HashMap<>();
         }
 
-        long key = getHeaderMonthlyKeyByExpense(expense);
+        long key = getHeaderMonthlyKeyByTransaction(transaction);
 
         if (!mExpensesPerMonth.containsKey(key)) {
             mExpensesPerMonth.put(key, 0.00f);
         } else {
             float monthExpense = mExpensesPerMonth.get(key);
-            monthExpense += expense.getQuantity();
+            monthExpense += transaction.getQuantity();
             mExpensesPerMonth.put(key, monthExpense);
         }
     }
 
-    private long getHeaderMonthlyKeyByExpense(Expense expense) {
+    private long getHeaderMonthlyKeyByTransaction(ITransactions transaction) {
         // Generate the key
         Calendar calendar = Calendar.getInstance();
-        calendar.setTime(expense.getDate());
+        calendar.setTime(transaction.getDate());
         calendar.set(Calendar.DAY_OF_MONTH, 0);
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);

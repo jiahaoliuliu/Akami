@@ -20,6 +20,7 @@ public class Sms {
     public enum Type {
         EXPENSE_1("A purchase transaction of AED(.*?) has been performed on your Credit Card (.*?) on (.*?) at (.*?) \\."),
         EXPENSE_2("Purchase transaction of AED(.*?) performed on your Credit Card (.*?) on (.*?) at (.*?)\\."),
+        WITHDRAW("AED (.*?) withdrawn from acc. (.*?) on (.*?) at (.*?)\\."),
         UNKNOWN("^$");
 
 //        EXPENSE_2;
