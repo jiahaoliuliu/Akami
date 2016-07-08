@@ -18,6 +18,8 @@ public class Expense implements ITransactions {
     // Static variables for parsing. Since the parsing is done in each expense, it does make sense to have them as static
     private static final SimpleDateFormat simpleDateFormatter = new SimpleDateFormat(DATE_FORMAT);
 
+    private String id;
+
     private Date date;
 
     private float quantity;
@@ -25,6 +27,8 @@ public class Expense implements ITransactions {
     private String creditCard;
 
     private String companyId;
+
+    private boolean isFirstTransactionOfTheMonth;
 
     // The constructor which creates expense from the sms
     public Expense(Sms sms) {
@@ -47,7 +51,10 @@ public class Expense implements ITransactions {
             throw new IllegalArgumentException("The type of the sms suppose to be expense 1 but it does not matches");
         }
 
-        // Get the first expense
+        // Id
+        this.id = sms.getId();
+
+        // Quantity
         try {
             this.quantity = Float.parseFloat(matcher.group(1));
         } catch (NumberFormatException numberFormatException) {
@@ -62,6 +69,11 @@ public class Expense implements ITransactions {
             this.date = sms.getDate();
         }
         this.companyId = matcher.group(4);
+    }
+
+    @Override
+    public String getId() {
+        return id;
     }
 
     @Override
@@ -90,6 +102,15 @@ public class Expense implements ITransactions {
     }
 
     @Override
+    public boolean isFirstTransactionOfTheMonth() {
+        return isFirstTransactionOfTheMonth;
+    }
+
+    public void setFirstTransactionOfTheMonth(boolean firstTransactionOfTheMonth) {
+        isFirstTransactionOfTheMonth = firstTransactionOfTheMonth;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -97,6 +118,9 @@ public class Expense implements ITransactions {
         Expense expense = (Expense) o;
 
         if (Float.compare(expense.getQuantity(), getQuantity()) != 0) return false;
+        if (isFirstTransactionOfTheMonth() != expense.isFirstTransactionOfTheMonth()) return false;
+        if (getId() != null ? !getId().equals(expense.getId()) : expense.getId() != null)
+            return false;
         if (getDate() != null ? !getDate().equals(expense.getDate()) : expense.getDate() != null)
             return false;
         if (creditCard != null ? !creditCard.equals(expense.creditCard) : expense.creditCard != null)
@@ -107,20 +131,24 @@ public class Expense implements ITransactions {
 
     @Override
     public int hashCode() {
-        int result = getDate() != null ? getDate().hashCode() : 0;
+        int result = getId() != null ? getId().hashCode() : 0;
+        result = 31 * result + (getDate() != null ? getDate().hashCode() : 0);
         result = 31 * result + (getQuantity() != +0.0f ? Float.floatToIntBits(getQuantity()) : 0);
         result = 31 * result + (creditCard != null ? creditCard.hashCode() : 0);
         result = 31 * result + (companyId != null ? companyId.hashCode() : 0);
+        result = 31 * result + (isFirstTransactionOfTheMonth() ? 1 : 0);
         return result;
     }
 
     @Override
     public String toString() {
         return "Expense{" +
-                "date=" + date +
+                "id='" + id + '\'' +
+                ", date=" + date +
                 ", quantity=" + quantity +
                 ", creditCard='" + creditCard + '\'' +
                 ", companyId='" + companyId + '\'' +
+                ", isFirstTransactionOfTheMonth=" + isFirstTransactionOfTheMonth +
                 '}';
     }
 }

@@ -16,6 +16,8 @@ public interface ITransactions {
         UNKNOWN;
     }
 
+    String getId();
+
     Type getType();
 
     float getQuantity();
@@ -25,4 +27,8 @@ public interface ITransactions {
     String getDestination();
 
     Date getDate();
+
+    boolean isFirstTransactionOfTheMonth();
+
+    void setFirstTransactionOfTheMonth(boolean firstTransactionOfTheMonth);
 }

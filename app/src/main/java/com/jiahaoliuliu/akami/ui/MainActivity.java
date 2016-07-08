@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.jiahaoliuliu.akami.R;
 import com.jiahaoliuliu.akami.model.Company;
@@ -15,7 +16,9 @@ import com.jiahaoliuliu.akami.model.Expense;
 import com.jiahaoliuliu.akami.model.Sms;
 import com.jiahaoliuliu.akami.model.ITransactions;
 import com.jiahaoliuliu.akami.model.Withdraw;
+import com.jiahaoliuliu.akami.utils.HeaderUtility;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +28,9 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
     private static final String ADDRESS_ADCB = "ADCBAlert";
+
+    // Date to be displayed as header
+    private static final String HEADER_DATE_FORMAT = "MMMM yyyy";
 
     // Projection. The fields of the sms to be returned
     private static final String[] PROJECTION = {
@@ -43,17 +49,26 @@ public class MainActivity extends AppCompatActivity {
     private static final String SORT_ORDER = Sms.COLUMN_DATE + " DESC";
 
     // Views
+    private TextView mHeaderDateTextView;
+    private TextView mHeaderQuantityTextView;
     private RecyclerView mTransactionsRecyclerView;
 
     // Internal variables
     private Context mContext;
 
+    // The expenses per month
+    private Map<Long, Float> mTransactionsPerMonth;
     private List<ITransactions> mTransactionsList;
     private TransactionsListAdapter mTransactionsListAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
+    private LinearLayoutManager mLinearLayoutManager;
 
     // The list of companies
     private Map<String, Company> mCompaniesMap;
+
+    // The header date formatter. This has to be static in order to be used by the adapter
+    public static SimpleDateFormat sHeaderDateFormatter = new SimpleDateFormat(HEADER_DATE_FORMAT);
+    // The month of the first element shown in the header
+    private long mFirstElementMonthlyKey;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,10 +79,13 @@ public class MainActivity extends AppCompatActivity {
         this.mContext = this;
 
         // Link the views
+        mHeaderDateTextView = (TextView) findViewById(R.id.header_date_text_view);
+        mHeaderQuantityTextView = (TextView) findViewById(R.id.header_quantity_text_view);
+
         mTransactionsRecyclerView = (RecyclerView) findViewById(R.id.transactions_recycler_view);
         mTransactionsRecyclerView.setHasFixedSize(true);
-        mLayoutManager = new LinearLayoutManager(this);
-        mTransactionsRecyclerView.setLayoutManager(mLayoutManager);
+        mLinearLayoutManager = new LinearLayoutManager(this);
+        mTransactionsRecyclerView.setLayoutManager(mLinearLayoutManager);
 
         // Create the list of companies
         mCompaniesMap = generateComapniesList();
@@ -92,13 +110,15 @@ public class MainActivity extends AppCompatActivity {
                             case EXPENSE_1:
                             case EXPENSE_2:
                                 Expense expense = new Expense(sms);
+                                updateTransactionsPerMonth(expense);
                                 mTransactionsList.add(expense);
 //                                Log.v(TAG, "Expense parsed " + expense);
                                 break;
                             case WITHDRAW_1:
                             case WITHDRAW_2:
                                 Withdraw withdraw = new Withdraw(sms);
-//                                Log.v(TAG, "Withdraw parsed " + sms.getBody());
+//                                Log.v(TAG, "Withdraw parsed " + withdraw);
+                                updateTransactionsPerMonth(withdraw);
                                 mTransactionsList.add(withdraw);
                                 break;
                             case UNKNOWN:
@@ -115,10 +135,48 @@ public class MainActivity extends AppCompatActivity {
             } while (cursor.moveToNext());
             cursor.close();
 
-            mTransactionsListAdapter = new TransactionsListAdapter(mContext, mTransactionsList, mCompaniesMap);
+            mTransactionsRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener(){
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                    int firstElementPosition = mLinearLayoutManager.findFirstVisibleItemPosition();
+                    ITransactions firstTransaction = mTransactionsList.get(firstElementPosition);
+
+                    // Update the header if needed
+                    long currentMonthlyKey = HeaderUtility.getHeaderMonthlyKeyByTransaction(firstTransaction);
+                    if (currentMonthlyKey != mFirstElementMonthlyKey) {
+                        // Update the month
+                        mHeaderDateTextView.setText(sHeaderDateFormatter.format(firstTransaction.getDate()));
+
+                        // Update the quantity
+                        mFirstElementMonthlyKey = currentMonthlyKey;
+                        mHeaderQuantityTextView.setText(String.format("%.02f", mTransactionsPerMonth.get(mFirstElementMonthlyKey))
+                                    + " " + getResources().getString(R.string.currency_aed));
+                    }
+                }
+            });
+            mTransactionsListAdapter = new TransactionsListAdapter(mContext, mTransactionsList, mCompaniesMap, mTransactionsPerMonth);
             mTransactionsRecyclerView.setAdapter(mTransactionsListAdapter);
         } else {
             Log.v(TAG, "The user does not have any sms");
+        }
+    }
+
+    private void updateTransactionsPerMonth(ITransactions transaction) {
+        // Intialize expense per month if needed
+        if (mTransactionsPerMonth == null) {
+            mTransactionsPerMonth = new HashMap<>();
+        }
+
+        long key = HeaderUtility.getHeaderMonthlyKeyByTransaction(transaction);
+
+        if (!mTransactionsPerMonth.containsKey(key)) {
+            mTransactionsPerMonth.put(key, 0.00f);
+            transaction.setFirstTransactionOfTheMonth(true);
+        } else {
+            float monthExpense = mTransactionsPerMonth.get(key);
+            monthExpense += transaction.getQuantity();
+            mTransactionsPerMonth.put(key, monthExpense);
         }
     }
 
@@ -245,6 +303,5 @@ public class MainActivity extends AppCompatActivity {
 
         return companiesMap;
     }
-
 
 }
