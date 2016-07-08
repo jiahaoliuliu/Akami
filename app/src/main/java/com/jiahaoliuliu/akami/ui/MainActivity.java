@@ -16,6 +16,7 @@ import com.jiahaoliuliu.akami.model.Expense;
 import com.jiahaoliuliu.akami.model.Sms;
 import com.jiahaoliuliu.akami.model.ITransactions;
 import com.jiahaoliuliu.akami.model.Withdraw;
+import com.jiahaoliuliu.akami.utils.HeaderUtility;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -50,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Views
     private TextView mHeaderDateTextView;
-    private TextView mHeaderExpensesTextView;
+    private TextView mHeaderQuantityTextView;
     private RecyclerView mTransactionsRecyclerView;
 
     // Internal variables
@@ -81,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Link the views
         mHeaderDateTextView = (TextView) findViewById(R.id.header_date_text_view);
-        mHeaderExpensesTextView = (TextView) findViewById(R.id.header_expenses_text_view);
+        mHeaderQuantityTextView = (TextView) findViewById(R.id.header_quantity_text_view);
 
         mTransactionsRecyclerView = (RecyclerView) findViewById(R.id.transactions_recycler_view);
         mTransactionsRecyclerView.setHasFixedSize(true);
@@ -146,14 +147,14 @@ public class MainActivity extends AppCompatActivity {
                     ITransactions firstTransaction = mTransactionsList.get(firstElementPosition);
 
                     // Update the header if needed
-                    long currentMonthlyKey = getHeaderMonthlyKeyByTransaction(firstTransaction);
+                    long currentMonthlyKey = HeaderUtility.getHeaderMonthlyKeyByTransaction(firstTransaction);
                     if (currentMonthlyKey != mFirstElementMonthlyKey) {
                         // Update the month
                         mHeaderDateTextView.setText(mHeaderDateFormatter.format(firstTransaction.getDate()));
 
                         // Update the expenses
                         mFirstElementMonthlyKey = currentMonthlyKey;
-                        mHeaderExpensesTextView.setText(String.format("%.02f", mExpensesPerMonth.get(mFirstElementMonthlyKey))
+                        mHeaderQuantityTextView.setText(String.format("%.02f", mExpensesPerMonth.get(mFirstElementMonthlyKey))
                                     + " " + getResources().getString(R.string.currency_aed));
                     }
                 }
@@ -171,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
             mExpensesPerMonth = new HashMap<>();
         }
 
-        long key = getHeaderMonthlyKeyByTransaction(transaction);
+        long key = HeaderUtility.getHeaderMonthlyKeyByTransaction(transaction);
 
         if (!mExpensesPerMonth.containsKey(key)) {
             mExpensesPerMonth.put(key, 0.00f);
@@ -180,17 +181,6 @@ public class MainActivity extends AppCompatActivity {
             monthExpense += transaction.getQuantity();
             mExpensesPerMonth.put(key, monthExpense);
         }
-    }
-
-    private long getHeaderMonthlyKeyByTransaction(ITransactions transaction) {
-        // Generate the key
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(transaction.getDate());
-        calendar.set(Calendar.DAY_OF_MONTH, 0);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        return calendar.getTimeInMillis();
     }
 
     // TODO: Use database instead

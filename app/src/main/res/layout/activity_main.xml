@@ -5,43 +5,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
-    <!-- Header -->
-    <LinearLayout
-        android:id="@+id/list_header_linear_layout"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:orientation="horizontal"
-        android:background="@color/colorPrimaryDark"
-        >
-        <!-- Month -->
-        <TextView
-            android:id="@+id/header_date_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:textColor="@android:color/white"
-            android:textStyle="bold"
-            android:gravity="center_vertical"
-            android:layout_marginLeft="10dp"
-            />
-        <!-- Expense -->
-        <TextView
-            android:id="@+id/header_expenses_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:textColor="@android:color/white"
-            android:textStyle="bold"
-            android:gravity="center_vertical|end"
-            android:text="0.00 AED"
-            android:layout_marginRight="10dp"
-            />
-    </LinearLayout>
+
+    <!-- Include the header -->
+    <include
+        layout="@layout/transactions_header" />
+
+    <!-- The content recycler view -->
     <android.support.v7.widget.RecyclerView
         android:id="@+id/transactions_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".ui.MainActivity"
-        android:layout_below="@id/list_header_linear_layout"
+        android:layout_below="@+id/header_linear_layout"
         >
     </android.support.v7.widget.RecyclerView>
 </RelativeLayout>

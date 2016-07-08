@@ -1,0 +1,32 @@
+<!-- The header for the transaction cards -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/header_linear_layout"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/expense_list_header_size"
+    android:orientation="horizontal"
+    android:background="@color/colorPrimaryDark"
+    >
+    <!-- Month -->
+    <TextView
+        android:id="@+id/header_date_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        android:gravity="center_vertical"
+        android:layout_marginLeft="10dp"
+        />
+    <!-- Expense -->
+    <TextView
+        android:id="@+id/header_quantity_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        android:gravity="center_vertical|end"
+        android:text="0.00 AED"
+        android:layout_marginRight="10dp"
+        />
+</LinearLayout>

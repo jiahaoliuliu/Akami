@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.jiahaoliuliu.akami.R;
@@ -24,7 +25,7 @@ import java.util.Map;
  */
 public class TransactionsListAdapter extends RecyclerView.Adapter<TransactionsListAdapter.ViewHolder> {
 
-    private static final String TAG = "ExpensesListAdapter";
+    private static final String TAG = "TransationsListAdapter";
 
     private static final String DATE_FORMAT = "EEE dd/MM HH:mm";
     private SimpleDateFormat mSimpleDateFormatter;
@@ -33,7 +34,8 @@ public class TransactionsListAdapter extends RecyclerView.Adapter<TransactionsLi
     private List<ITransactions> mTransactionsList;
     private Map<String, Company> mCompaniesMap;
 
-    public TransactionsListAdapter(Context context, List<ITransactions> transactionsList, Map<String, Company> companiesMap) {
+    public TransactionsListAdapter(Context context,
+                                   List<ITransactions> transactionsList, Map<String, Company> companiesMap) {
         this.mContext = context;
         this.mTransactionsList = transactionsList;
         this.mSimpleDateFormatter = new SimpleDateFormat(DATE_FORMAT);
@@ -50,8 +52,16 @@ public class TransactionsListAdapter extends RecyclerView.Adapter<TransactionsLi
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        final ITransactions transaction = mTransactionsList.get(position);
+        // Set the header
+        if (isFirstTransactionOfTheMonth(position)) {
+            holder.mHeaderLinearLayout.setVisibility(View.VISIBLE);
+            // TODO: Set the items
+        } else {
+            holder.mHeaderLinearLayout.setVisibility(View.GONE);
+        }
 
+        // Set the content
+        final ITransactions transaction = mTransactionsList.get(position);
         // TODO: Create different view for Withdraws
         // Source name & logo
         String companyId = transaction.getSource();
@@ -92,7 +102,7 @@ public class TransactionsListAdapter extends RecyclerView.Adapter<TransactionsLi
                 holder.mSourceLogoImageView.setVisibility(View.VISIBLE);
                 break;
         }
-        holder.mQuantityTextView.setText(transaction.getQuantity() + " " + mContext.getResources().getString(R.string.currency_aed));
+        holder.mQuantityTextView.setText(String.format("%.02f", transaction.getQuantity()) + " " + mContext.getResources().getString(R.string.currency_aed));
         holder.mDateTextView.setText(mSimpleDateFormatter.format(transaction.getDate()));
     }
 
@@ -107,6 +117,12 @@ public class TransactionsListAdapter extends RecyclerView.Adapter<TransactionsLi
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
+        // Header
+        public LinearLayout mHeaderLinearLayout;
+        public TextView mHeaderDateTextView;
+        public TextView mHeaderQuantityTextView;
+
+        // Content
         // TODO: Set credit card
         public TextView mSourceTextView;
         public ImageView mSourceLogoImageView;
@@ -115,10 +131,21 @@ public class TransactionsListAdapter extends RecyclerView.Adapter<TransactionsLi
 
         public ViewHolder(View view) {
             super(view);
+            // Header
+            this.mHeaderLinearLayout = (LinearLayout) view.findViewById(R.id.header_linear_layout);
+            this.mHeaderDateTextView = (TextView) view.findViewById(R.id.header_date_text_view);
+            this.mHeaderQuantityTextView = (TextView) view.findViewById(R.id.header_quantity_text_view);
+
+            // Content
             this.mSourceTextView = (TextView) view.findViewById(R.id.source_text_view);
             this.mSourceLogoImageView = (ImageView) view.findViewById(R.id.source_logo_image_view);
             this.mQuantityTextView = (TextView) view.findViewById(R.id.quantity_text_view);
             this.mDateTextView = (TextView) view.findViewById(R.id.date_text_view);
         }
+    }
+
+    private boolean isFirstTransactionOfTheMonth(int position) {
+        // TODO: Implement this
+        return false;
     }
 }

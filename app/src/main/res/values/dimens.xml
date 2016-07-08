@@ -4,6 +4,7 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
     <!-- Expenses list -->
+    <dimen name="expense_list_header_size">50dp</dimen>
     <dimen name="expense_list_title_size">18sp</dimen>
     <dimen name="expense_list_expense_size">16sp</dimen>
     <dimen name="expense_list_logo">50dp</dimen>
