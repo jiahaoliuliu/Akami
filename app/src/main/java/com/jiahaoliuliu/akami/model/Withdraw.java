@@ -13,11 +13,8 @@ import java.util.regex.Pattern;
  * - AED 4200.00 withdrawn from acc. XXX132001 on Feb  1 2015  6:32PM at ATM-CBD ATM MARINA BR 2501.
  *   Avail.Bal.AED12283.31.Exercise caution with large amount of cash.Visit www.adcb.com/mobileapp to
  *   download the ADCB Mobile Banking App.
-<<<<<<< HEAD
-=======
  * - AED200.00 was withdrawn from your Credit Card XXX4921 on 25/05/2015 21:04:56  at ADIB METRO DIC DXB,DUBAI-AE.
  *   Available credit limit is now AED 32655.38
->>>>>>> feature/parseWithDraws
  * Created by jiahaoliuliu on 7/7/16.
  */
 public class Withdraw implements ITransactions {
@@ -34,6 +31,8 @@ public class Withdraw implements ITransactions {
     private static final SimpleDateFormat DATE_FORMATTER_WITHDRAW_1 = new SimpleDateFormat(DATE_FORMAT_WITHDRAW_1);
     private static final SimpleDateFormat DATE_FORMATTER_WITHDRAW_2 = new SimpleDateFormat(DATE_FORMAT_WITHDRAW_2);
 
+    private String id;
+
     private Date date;
 
     private float quantity;
@@ -42,6 +41,8 @@ public class Withdraw implements ITransactions {
 
     // When the app is able to parse more than one bank, add the field bank
     private String branch;
+
+    private boolean isFirstTransactionOfTheMonth;
 
     // The constructor which creates expense from the sms
     public Withdraw(Sms sms) {
@@ -67,7 +68,10 @@ public class Withdraw implements ITransactions {
             throw new IllegalArgumentException("The type of the sms suppose to be expense 1 but it does not matches");
         }
 
-        // Get the first expense
+        // Id
+        this.id = sms.getId();
+
+        // Quantity
         try {
             this.quantity = Float.parseFloat(matcher.group(1));
         } catch (NumberFormatException numberFormatException) {
@@ -92,7 +96,10 @@ public class Withdraw implements ITransactions {
             throw new IllegalArgumentException("The type of the sms suppose to be expense 1 but it does not matches");
         }
 
-        // Get the first expense
+        // Id
+        this.id = sms.getId();
+
+        // Quantity
         try {
             this.quantity = Float.parseFloat(matcher.group(1));
         } catch (NumberFormatException numberFormatException) {
@@ -108,6 +115,11 @@ public class Withdraw implements ITransactions {
             this.date = sms.getDate();
         }
         this.branch = matcher.group(4);
+    }
+
+    @Override
+    public String getId() {
+        return id;
     }
 
     @Override
@@ -136,6 +148,16 @@ public class Withdraw implements ITransactions {
     }
 
     @Override
+    public boolean isFirstTransactionOfTheMonth() {
+        return isFirstTransactionOfTheMonth;
+    }
+
+    @Override
+    public void setFirstTransactionOfTheMonth(boolean firstTransactionOfTheMonth) {
+        isFirstTransactionOfTheMonth = firstTransactionOfTheMonth;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -143,6 +165,9 @@ public class Withdraw implements ITransactions {
         Withdraw withdraw = (Withdraw) o;
 
         if (Float.compare(withdraw.getQuantity(), getQuantity()) != 0) return false;
+        if (isFirstTransactionOfTheMonth() != withdraw.isFirstTransactionOfTheMonth()) return false;
+        if (getId() != null ? !getId().equals(withdraw.getId()) : withdraw.getId() != null)
+            return false;
         if (getDate() != null ? !getDate().equals(withdraw.getDate()) : withdraw.getDate() != null)
             return false;
         if (account != null ? !account.equals(withdraw.account) : withdraw.account != null)
@@ -153,20 +178,24 @@ public class Withdraw implements ITransactions {
 
     @Override
     public int hashCode() {
-        int result = getDate() != null ? getDate().hashCode() : 0;
+        int result = getId() != null ? getId().hashCode() : 0;
+        result = 31 * result + (getDate() != null ? getDate().hashCode() : 0);
         result = 31 * result + (getQuantity() != +0.0f ? Float.floatToIntBits(getQuantity()) : 0);
         result = 31 * result + (account != null ? account.hashCode() : 0);
         result = 31 * result + (branch != null ? branch.hashCode() : 0);
+        result = 31 * result + (isFirstTransactionOfTheMonth() ? 1 : 0);
         return result;
     }
 
     @Override
     public String toString() {
         return "Withdraw{" +
-                "date=" + date +
+                "id='" + id + '\'' +
+                ", date=" + date +
                 ", quantity=" + quantity +
                 ", account='" + account + '\'' +
                 ", branch='" + branch + '\'' +
+                ", isFirstTransactionOfTheMonth=" + isFirstTransactionOfTheMonth +
                 '}';
     }
 }

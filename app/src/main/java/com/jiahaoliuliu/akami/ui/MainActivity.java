@@ -20,7 +20,6 @@ import com.jiahaoliuliu.akami.utils.HeaderUtility;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -176,6 +175,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (!mExpensesPerMonth.containsKey(key)) {
             mExpensesPerMonth.put(key, 0.00f);
+            transaction.setFirstTransactionOfTheMonth(true);
         } else {
             float monthExpense = mExpensesPerMonth.get(key);
             monthExpense += transaction.getQuantity();

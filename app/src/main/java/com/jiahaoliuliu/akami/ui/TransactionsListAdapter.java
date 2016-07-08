@@ -52,8 +52,10 @@ public class TransactionsListAdapter extends RecyclerView.Adapter<TransactionsLi
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+        final ITransactions transaction = mTransactionsList.get(position);
+
         // Set the header
-        if (isFirstTransactionOfTheMonth(position)) {
+        if (transaction.isFirstTransactionOfTheMonth() && position != 0) {
             holder.mHeaderLinearLayout.setVisibility(View.VISIBLE);
             // TODO: Set the items
         } else {
@@ -61,7 +63,6 @@ public class TransactionsListAdapter extends RecyclerView.Adapter<TransactionsLi
         }
 
         // Set the content
-        final ITransactions transaction = mTransactionsList.get(position);
         // TODO: Create different view for Withdraws
         // Source name & logo
         String companyId = transaction.getSource();
@@ -142,10 +143,5 @@ public class TransactionsListAdapter extends RecyclerView.Adapter<TransactionsLi
             this.mQuantityTextView = (TextView) view.findViewById(R.id.quantity_text_view);
             this.mDateTextView = (TextView) view.findViewById(R.id.date_text_view);
         }
-    }
-
-    private boolean isFirstTransactionOfTheMonth(int position) {
-        // TODO: Implement this
-        return false;
     }
 }
