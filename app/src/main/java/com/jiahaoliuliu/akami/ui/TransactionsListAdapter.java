@@ -15,6 +15,7 @@ import com.jiahaoliuliu.akami.R;
 import com.jiahaoliuliu.akami.model.Company;
 import com.jiahaoliuliu.akami.model.ITransactions;
 import com.jiahaoliuliu.akami.model.Withdraw;
+import com.jiahaoliuliu.akami.utils.HeaderUtility;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -33,13 +34,16 @@ public class TransactionsListAdapter extends RecyclerView.Adapter<TransactionsLi
     private Context mContext;
     private List<ITransactions> mTransactionsList;
     private Map<String, Company> mCompaniesMap;
+    private Map<Long, Float> mTransactionsPerMonth;
 
     public TransactionsListAdapter(Context context,
-                                   List<ITransactions> transactionsList, Map<String, Company> companiesMap) {
+                                   List<ITransactions> transactionsList, Map<String, Company> companiesMap,
+                                   Map<Long, Float> transactionsPerMonth) {
         this.mContext = context;
         this.mTransactionsList = transactionsList;
         this.mSimpleDateFormatter = new SimpleDateFormat(DATE_FORMAT);
         this.mCompaniesMap = companiesMap;
+        this.mTransactionsPerMonth = transactionsPerMonth;
     }
 
     @Override
@@ -57,7 +61,13 @@ public class TransactionsListAdapter extends RecyclerView.Adapter<TransactionsLi
         // Set the header
         if (transaction.isFirstTransactionOfTheMonth() && position != 0) {
             holder.mHeaderLinearLayout.setVisibility(View.VISIBLE);
-            // TODO: Set the items
+            long currentMonthlyKey = HeaderUtility.getHeaderMonthlyKeyByTransaction(transaction);
+            // Set the month
+            holder.mHeaderDateTextView.setText(MainActivity.sHeaderDateFormatter.format(transaction.getDate()));
+
+            // Set the quantity
+            holder.mHeaderQuantityTextView.setText(String.format("%.02f", mTransactionsPerMonth.get(currentMonthlyKey))
+                    + " " + mContext.getResources().getString(R.string.currency_aed));
         } else {
             holder.mHeaderLinearLayout.setVisibility(View.GONE);
         }

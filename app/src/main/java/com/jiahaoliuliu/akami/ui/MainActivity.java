@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
     private Context mContext;
 
     // The expenses per month
-    private Map<Long, Float> mExpensesPerMonth;
+    private Map<Long, Float> mTransactionsPerMonth;
     private List<ITransactions> mTransactionsList;
     private TransactionsListAdapter mTransactionsListAdapter;
     private LinearLayoutManager mLinearLayoutManager;
@@ -65,8 +65,8 @@ public class MainActivity extends AppCompatActivity {
     // The list of companies
     private Map<String, Company> mCompaniesMap;
 
-    // The header date formatter
-    private SimpleDateFormat mHeaderDateFormatter;
+    // The header date formatter. This has to be static in order to be used by the adapter
+    public static SimpleDateFormat sHeaderDateFormatter = new SimpleDateFormat(HEADER_DATE_FORMAT);
     // The month of the first element shown in the header
     private long mFirstElementMonthlyKey;
 
@@ -77,7 +77,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Set variables
         this.mContext = this;
-        mHeaderDateFormatter = new SimpleDateFormat(HEADER_DATE_FORMAT);
 
         // Link the views
         mHeaderDateTextView = (TextView) findViewById(R.id.header_date_text_view);
@@ -136,8 +135,6 @@ public class MainActivity extends AppCompatActivity {
             } while (cursor.moveToNext());
             cursor.close();
 
-            mTransactionsListAdapter = new TransactionsListAdapter(mContext, mTransactionsList, mCompaniesMap);
-            mTransactionsRecyclerView.setAdapter(mTransactionsListAdapter);
             mTransactionsRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener(){
                 @Override
                 public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -149,16 +146,16 @@ public class MainActivity extends AppCompatActivity {
                     long currentMonthlyKey = HeaderUtility.getHeaderMonthlyKeyByTransaction(firstTransaction);
                     if (currentMonthlyKey != mFirstElementMonthlyKey) {
                         // Update the month
-                        mHeaderDateTextView.setText(mHeaderDateFormatter.format(firstTransaction.getDate()));
+                        mHeaderDateTextView.setText(sHeaderDateFormatter.format(firstTransaction.getDate()));
 
-                        // Update the expenses
+                        // Update the quantity
                         mFirstElementMonthlyKey = currentMonthlyKey;
-                        mHeaderQuantityTextView.setText(String.format("%.02f", mExpensesPerMonth.get(mFirstElementMonthlyKey))
+                        mHeaderQuantityTextView.setText(String.format("%.02f", mTransactionsPerMonth.get(mFirstElementMonthlyKey))
                                     + " " + getResources().getString(R.string.currency_aed));
                     }
                 }
             });
-            mTransactionsListAdapter = new TransactionsListAdapter(mContext, mTransactionsList, mCompaniesMap);
+            mTransactionsListAdapter = new TransactionsListAdapter(mContext, mTransactionsList, mCompaniesMap, mTransactionsPerMonth);
             mTransactionsRecyclerView.setAdapter(mTransactionsListAdapter);
         } else {
             Log.v(TAG, "The user does not have any sms");
@@ -167,19 +164,19 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateTransactionsPerMonth(ITransactions transaction) {
         // Intialize expense per month if needed
-        if (mExpensesPerMonth == null) {
-            mExpensesPerMonth = new HashMap<>();
+        if (mTransactionsPerMonth == null) {
+            mTransactionsPerMonth = new HashMap<>();
         }
 
         long key = HeaderUtility.getHeaderMonthlyKeyByTransaction(transaction);
 
-        if (!mExpensesPerMonth.containsKey(key)) {
-            mExpensesPerMonth.put(key, 0.00f);
+        if (!mTransactionsPerMonth.containsKey(key)) {
+            mTransactionsPerMonth.put(key, 0.00f);
             transaction.setFirstTransactionOfTheMonth(true);
         } else {
-            float monthExpense = mExpensesPerMonth.get(key);
+            float monthExpense = mTransactionsPerMonth.get(key);
             monthExpense += transaction.getQuantity();
-            mExpensesPerMonth.put(key, monthExpense);
+            mTransactionsPerMonth.put(key, monthExpense);
         }
     }
 
