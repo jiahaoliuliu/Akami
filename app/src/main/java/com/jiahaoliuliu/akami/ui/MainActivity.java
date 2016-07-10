@@ -1,6 +1,7 @@
 package com.jiahaoliuliu.akami.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
@@ -8,6 +9,8 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.jiahaoliuliu.akami.R;
@@ -49,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String SORT_ORDER = Sms.COLUMN_DATE + " DESC";
 
     // Views
+    private LinearLayout mHeaderLinearLayout;
     private TextView mHeaderDateTextView;
     private TextView mHeaderQuantityTextView;
     private RecyclerView mTransactionsRecyclerView;
@@ -79,6 +83,9 @@ public class MainActivity extends AppCompatActivity {
         this.mContext = this;
 
         // Link the views
+        mHeaderLinearLayout = (LinearLayout) findViewById(R.id.header_linear_layout);
+        mHeaderLinearLayout.setOnClickListener(mOnClickListener);
+
         mHeaderDateTextView = (TextView) findViewById(R.id.header_date_text_view);
         mHeaderQuantityTextView = (TextView) findViewById(R.id.header_quantity_text_view);
 
@@ -179,6 +186,18 @@ public class MainActivity extends AppCompatActivity {
             mTransactionsPerMonth.put(key, monthExpense);
         }
     }
+
+    private View.OnClickListener mOnClickListener = new View.OnClickListener(){
+        @Override
+        public void onClick(View view) {
+            switch (view.getId()) {
+                case R.id.header_linear_layout:
+                    Intent startMonthlyExpensesActivityIntent = new Intent(mContext, MonthlyExpensesActivity.class);
+                    startActivity(startMonthlyExpensesActivityIntent);
+                    break;
+            }
+        }
+    };
 
     // TODO: Use database instead
     private Map<String, Company> generateComapniesList() {
