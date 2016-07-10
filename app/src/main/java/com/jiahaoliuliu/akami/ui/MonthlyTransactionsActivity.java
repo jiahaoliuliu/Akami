@@ -5,11 +5,11 @@ import android.os.Bundle;
 
 import com.jiahaoliuliu.akami.R;
 
-public class MonthlyExpensesActivity extends AppCompatActivity {
+public class MonthlyTransactionsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_monthly_expenses);
+        setContentView(R.layout.activity_monthly_transactions);
     }
 }

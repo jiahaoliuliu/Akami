@@ -192,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View view) {
             switch (view.getId()) {
                 case R.id.header_linear_layout:
-                    Intent startMonthlyExpensesActivityIntent = new Intent(mContext, MonthlyExpensesActivity.class);
+                    Intent startMonthlyExpensesActivityIntent = new Intent(mContext, MonthlyTransactionsActivity.class);
                     startActivity(startMonthlyExpensesActivityIntent);
                     break;
             }
