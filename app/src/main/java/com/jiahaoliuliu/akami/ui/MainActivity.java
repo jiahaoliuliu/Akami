@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import com.jiahaoliuliu.akami.R;
@@ -52,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView mHeaderDateTextView;
     private TextView mHeaderQuantityTextView;
     private RecyclerView mTransactionsRecyclerView;
+    private TextView mNoSmsTextView;
 
     // Internal variables
     private Context mContext;
@@ -86,6 +88,8 @@ public class MainActivity extends AppCompatActivity {
         mTransactionsRecyclerView.setHasFixedSize(true);
         mLinearLayoutManager = new LinearLayoutManager(this);
         mTransactionsRecyclerView.setLayoutManager(mLinearLayoutManager);
+
+        mNoSmsTextView = (TextView) findViewById(R.id.no_sms_text_view);
 
         // Create the list of companies
         mCompaniesMap = generateComapniesList();
@@ -157,8 +161,12 @@ public class MainActivity extends AppCompatActivity {
             });
             mTransactionsListAdapter = new TransactionsListAdapter(mContext, mTransactionsList, mCompaniesMap, mTransactionsPerMonth);
             mTransactionsRecyclerView.setAdapter(mTransactionsListAdapter);
+
+            // Disable the no sms view
+            mNoSmsTextView.setVisibility(View.GONE);
         } else {
             Log.v(TAG, "The user does not have any sms");
+
         }
     }
 
