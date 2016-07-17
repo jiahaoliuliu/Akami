@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Akami</string>
+
+    <!-- Expense -->
+    <string name="currency_aed">AED</string>
+    <string name="main_activity_no_sms">For now this app only works with ADCB. Sorry about the incovenience</string>
 </resources>
