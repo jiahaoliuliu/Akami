@@ -17,33 +17,28 @@ import com.github.mikephil.charting.formatter.AxisValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
-import com.github.mikephil.charting.utils.ColorTemplate;
 import com.jiahaoliuliu.akami.R;
 
 import com.jiahaoliuliu.akami.utils.CurrencyYAxisValueFormatterEmpty;
-import com.jiahaoliuliu.akami.utils.DayAxisValueFormatter;
+import com.jiahaoliuliu.akami.utils.MonthAxisValueFormatter;
 import com.jiahaoliuliu.akami.utils.CurrencyYAxisValueFormatter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.TimeZone;
 
 public class MonthlyTransactionsActivity extends AppCompatActivity {
 
     private static final String TAG = "MonthlyTransactionsActivity";
     public static final String INTENT_KEY_MONTHLY_TRANSACTIONS = "MonthlyTransactions";
 
-    // Date to be displayed as header
-    private static final String LABEL_DATE_FORMAT = "MMMM yyyy";
-
     // Views
     private BarChart mMonthlyTransactionsBarChart;
 
     // Internal variables
     private HashMap<Long, Float> mMonthlyTransactions;
-    private SimpleDateFormat mDateLabelFormatter;
+    private List<Long> mMonthlyDatesSorted;
 
     @SuppressLint("LongLogTag")
     @Override
@@ -66,8 +61,8 @@ public class MonthlyTransactionsActivity extends AppCompatActivity {
         mMonthlyTransactions = (HashMap<Long, Float>) extras.getSerializable(INTENT_KEY_MONTHLY_TRANSACTIONS);
         Log.d(TAG, "Monthly transactions get " + mMonthlyTransactions);
 
-        // Initiate internal variables
-        mDateLabelFormatter = new SimpleDateFormat(LABEL_DATE_FORMAT, getResources().getConfiguration().locale);
+        mMonthlyDatesSorted = new ArrayList<>(mMonthlyTransactions.keySet());
+        Collections.sort(mMonthlyDatesSorted);
 
         // Link the views
         mMonthlyTransactionsBarChart = (BarChart) findViewById(R.id.monthly_transactions_bar_chart);
@@ -103,7 +98,7 @@ public class MonthlyTransactionsActivity extends AppCompatActivity {
         xAxis.setDrawGridLines(false);
         xAxis.setGranularity(1f); // only intervals of 1 day
         xAxis.setLabelCount(7);
-        xAxis.setValueFormatter(new DayAxisValueFormatter(mMonthlyTransactionsBarChart));
+        xAxis.setValueFormatter(new MonthAxisValueFormatter(mMonthlyDatesSorted));
 
         // Draw the y Axis
         //      Hide the left Y axis
@@ -149,35 +144,13 @@ public class MonthlyTransactionsActivity extends AppCompatActivity {
             return;
         }
 
-        //ArrayList<BarEntry> monthlyBars = new ArrayList<>();
-        //ArrayList<String> labels = new ArrayList<>();
-        //int position = 0;
-        //for (Long key : mMonthlyTransactions.keySet()) {
-        //    // Create the label
-        //    labels.add(mDateLabelFormatter.format(new Date(key)));
-        //
-        //    // Set the value
-        //    Log.v(TAG, "Value get " + mMonthlyTransactions.get(key) + " for the position " + position);
-        //    monthlyBars.add(new BarEntry(mMonthlyTransactions.get(key), position));
-        //    position++;
-        //}
-        //
-        //BarDataSet barDataSet = new BarDataSet(monthlyBars, "Transactions");
-        //BarData barData = new BarData(barDataSet);
-        //mMonthlyTransactionsBarChart.setData(barData);
-        int count = mMonthlyTransactions.size();
-
         mMonthlyTransactionsBarChart.getXAxis().setAxisMinValue(0f);
-        mMonthlyTransactionsBarChart.getXAxis().setAxisMaxValue(count + 1);
+        mMonthlyTransactionsBarChart.getXAxis().setAxisMaxValue(mMonthlyTransactions.size() + 1);
 
         ArrayList<BarEntry> yVals1 = new ArrayList<BarEntry>();
 
-        List<Long> months = new ArrayList<>(mMonthlyTransactions.keySet());
-        Collections.sort(months);
-        for (int i = 0; i < months.size(); i ++) {
-            long month = months.get(i);
-            Log.v(TAG, "Checking for the month " + mDateLabelFormatter.format(month) +
-                                                    " " + mMonthlyTransactions.get(month) + "(" + month + ")");
+        for (int i = 0; i < mMonthlyDatesSorted.size(); i ++) {
+            long month = mMonthlyDatesSorted.get(i);
             BarEntry barEntry = new BarEntry(i + 1f, mMonthlyTransactions.get(month));
             yVals1.add(barEntry);
         }
