@@ -172,16 +172,14 @@ public class MonthlyTransactionsActivity extends AppCompatActivity {
 
         ArrayList<BarEntry> yVals1 = new ArrayList<BarEntry>();
 
-        int i = 0;
-        //for (int i = (int) start; i < start + count + 1; i++) {
         List<Long> months = new ArrayList<>(mMonthlyTransactions.keySet());
         Collections.sort(months);
-        for (long month: months) {
+        for (int i = 0; i < months.size(); i ++) {
+            long month = months.get(i);
             Log.v(TAG, "Checking for the month " + mDateLabelFormatter.format(month) +
                                                     " " + mMonthlyTransactions.get(month) + "(" + month + ")");
             BarEntry barEntry = new BarEntry(i + 1f, mMonthlyTransactions.get(month));
             yVals1.add(barEntry);
-            i++;
         }
 
         BarDataSet set1;
@@ -194,7 +192,7 @@ public class MonthlyTransactionsActivity extends AppCompatActivity {
             mMonthlyTransactionsBarChart.notifyDataSetChanged();
         } else {
             set1 = new BarDataSet(yVals1, "Monthly expenses");
-            set1.setColors(ColorTemplate.MATERIAL_COLORS);
+            set1.setColors(new int[]{getResources().getColor(R.color.colorPrimary)});
 
             ArrayList<IBarDataSet> dataSets = new ArrayList<IBarDataSet>();
             dataSets.add(set1);
