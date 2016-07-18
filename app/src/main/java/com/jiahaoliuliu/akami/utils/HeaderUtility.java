@@ -1,8 +1,10 @@
 package com.jiahaoliuliu.akami.utils;
 
+import android.content.Context;
 import com.jiahaoliuliu.akami.model.ITransactions;
 
 import java.util.Calendar;
+import java.util.TimeZone;
 
 /**
  *
@@ -15,7 +17,10 @@ public class HeaderUtility {
         // Generate the key
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(transaction.getDate());
-        calendar.set(Calendar.DAY_OF_MONTH, 0);
+        // Adjust the timezone to GMT
+        calendar.add(Calendar.MILLISECOND,  calendar.getTimeZone().getOffset(calendar.getTimeInMillis()));
+        // Reset the day, hour, minutes and seconds
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);

@@ -333,8 +333,6 @@ public class MainActivity extends AppCompatActivity {
         company = new Company(companyId, "Bershka");
         companiesMap.put(companyId, company);
 
-
-
         return companiesMap;
     }
 

@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TimeZone;
 
 public class MonthlyTransactionsActivity extends AppCompatActivity {
 
@@ -66,7 +67,7 @@ public class MonthlyTransactionsActivity extends AppCompatActivity {
         Log.d(TAG, "Monthly transactions get " + mMonthlyTransactions);
 
         // Initiate internal variables
-        mDateLabelFormatter = new SimpleDateFormat(LABEL_DATE_FORMAT);
+        mDateLabelFormatter = new SimpleDateFormat(LABEL_DATE_FORMAT, getResources().getConfiguration().locale);
 
         // Link the views
         mMonthlyTransactionsBarChart = (BarChart) findViewById(R.id.monthly_transactions_bar_chart);
@@ -176,8 +177,8 @@ public class MonthlyTransactionsActivity extends AppCompatActivity {
         List<Long> months = new ArrayList<>(mMonthlyTransactions.keySet());
         Collections.sort(months);
         for (long month: months) {
-            Log.v(TAG, "Checkinf for the month " + mDateLabelFormatter.format(month) +
-                                                    " " + mMonthlyTransactions.get(month));
+            Log.v(TAG, "Checking for the month " + mDateLabelFormatter.format(month) +
+                                                    " " + mMonthlyTransactions.get(month) + "(" + month + ")");
             BarEntry barEntry = new BarEntry(i + 1f, mMonthlyTransactions.get(month));
             yVals1.add(barEntry);
             i++;
