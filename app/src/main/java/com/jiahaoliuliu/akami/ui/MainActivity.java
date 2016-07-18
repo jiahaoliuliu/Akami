@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
     private Context mContext;
 
     // The expenses per month
-    private Map<Long, Float> mTransactionsPerMonth;
+    private HashMap<Long, Float> mTransactionsPerMonth;
     private List<ITransactions> mTransactionsList;
     private TransactionsListAdapter mTransactionsListAdapter;
     private LinearLayoutManager mLinearLayoutManager;
@@ -199,7 +199,15 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View view) {
             switch (view.getId()) {
                 case R.id.header_linear_layout:
+                    // If the data is not ready, don't do anything
+                    if (mTransactionsPerMonth == null) {
+                        Log.w(TAG, "Trying to check the monthly transactions when the data is not ready");
+                        break;
+                    }
+
                     Intent startMonthlyExpensesActivityIntent = new Intent(mContext, MonthlyTransactionsActivity.class);
+                    startMonthlyExpensesActivityIntent.putExtra(MonthlyTransactionsActivity.INTENT_KEY_MONTHLY_TRANSACTIONS,
+                            mTransactionsPerMonth);
                     startActivity(startMonthlyExpensesActivityIntent);
                     break;
             }
