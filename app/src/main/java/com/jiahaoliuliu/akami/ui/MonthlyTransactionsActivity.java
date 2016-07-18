@@ -176,6 +176,8 @@ public class MonthlyTransactionsActivity extends AppCompatActivity {
         List<Long> months = new ArrayList<>(mMonthlyTransactions.keySet());
         Collections.sort(months);
         for (long month: months) {
+            Log.v(TAG, "Checkinf for the month " + mDateLabelFormatter.format(month) +
+                                                    " " + mMonthlyTransactions.get(month));
             BarEntry barEntry = new BarEntry(i + 1f, mMonthlyTransactions.get(month));
             yVals1.add(barEntry);
             i++;
