@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -30,6 +32,8 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
+    private static final int MENU_ITEM_SHOW_MONTHLY_GRAPH_ID = 1000;
+
     private static final String ADDRESS_ADCB = "ADCBAlert";
 
     // Date to be displayed as header
@@ -84,9 +88,6 @@ public class MainActivity extends AppCompatActivity {
         this.mContext = this;
 
         // Link the views
-        mHeaderLinearLayout = (LinearLayout) findViewById(R.id.header_linear_layout);
-        mHeaderLinearLayout.setOnClickListener(mOnClickListener);
-
         mHeaderDateTextView = (TextView) findViewById(R.id.header_date_text_view);
         mHeaderQuantityTextView = (TextView) findViewById(R.id.header_quantity_text_view);
 
@@ -194,25 +195,39 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private View.OnClickListener mOnClickListener = new View.OnClickListener(){
-        @Override
-        public void onClick(View view) {
-            switch (view.getId()) {
-                case R.id.header_linear_layout:
-                    // If the data is not ready, don't do anything
-                    if (mTransactionsPerMonth == null) {
-                        Log.w(TAG, "Trying to check the monthly transactions when the data is not ready");
-                        break;
-                    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuItem showMonthlyGraphMenuItem = menu.add(Menu.NONE, MENU_ITEM_SHOW_MONTHLY_GRAPH_ID, Menu
+            .NONE, R.string.action_bar_show_monthly_graph)
+            .setIcon(R.drawable.ic_action_show_monthly_graph);
+        showMonthlyGraphMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+        return super.onCreateOptionsMenu(menu);
+    }
 
-                    Intent startMonthlyExpensesActivityIntent = new Intent(mContext, MonthlyTransactionsActivity.class);
-                    startMonthlyExpensesActivityIntent.putExtra(MonthlyTransactionsActivity.INTENT_KEY_MONTHLY_TRANSACTIONS,
-                            mTransactionsPerMonth);
-                    startActivity(startMonthlyExpensesActivityIntent);
-                    break;
-            }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case MENU_ITEM_SHOW_MONTHLY_GRAPH_ID:
+                showMonthlyGraphs();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-    };
+    }
+
+    private void showMonthlyGraphs() {
+        // If the data is not ready, don't do anything
+        if (mTransactionsPerMonth == null) {
+            Log.w(TAG, "Trying to check the monthly transactions when the data is not ready");
+            return;
+        }
+
+        Intent startMonthlyExpensesActivityIntent = new Intent(mContext, MonthlyTransactionsActivity.class);
+        startMonthlyExpensesActivityIntent.putExtra(MonthlyTransactionsActivity.INTENT_KEY_MONTHLY_TRANSACTIONS,
+            mTransactionsPerMonth);
+        startActivity(startMonthlyExpensesActivityIntent);
+        return;
+    }
 
     // TODO: Use database instead
     private Map<String, Company> generateComapniesList() {
