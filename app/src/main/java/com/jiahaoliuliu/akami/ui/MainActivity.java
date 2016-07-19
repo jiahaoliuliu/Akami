@@ -217,7 +217,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void showMonthlyGraphs() {
         // If the data is not ready, don't do anything
-        if (mTransactionsPerMonth == null) {
+        if (mTransactionsPerMonth == null || mTransactionsPerMonth.isEmpty()) {
             Log.w(TAG, "Trying to check the monthly transactions when the data is not ready");
             return;
         }
