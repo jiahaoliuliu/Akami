@@ -5,4 +5,5 @@
     <string name="currency_aed">AED</string>
     <string name="main_activity_no_sms">For now this app only works with ADCB. Sorry about the incovenience</string>
     <string name="action_bar_show_monthly_graph">Show monthly graph</string>
+    <string name="monthly_transactions_graph">Monthly transactions</string>
 </resources>
