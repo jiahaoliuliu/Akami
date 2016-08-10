@@ -1,6 +1,7 @@
 package com.jiahaoliuliu.akami.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
@@ -8,7 +9,10 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.jiahaoliuliu.akami.R;
@@ -28,6 +32,8 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
+    private static final int MENU_ITEM_SHOW_MONTHLY_GRAPH_ID = 1000;
+
     private static final String ADDRESS_ADCB = "ADCBAlert";
 
     // Date to be displayed as header
@@ -50,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String SORT_ORDER = Sms.COLUMN_DATE + " DESC";
 
     // Views
+    private LinearLayout mHeaderLinearLayout;
     private TextView mHeaderDateTextView;
     private TextView mHeaderQuantityTextView;
     private RecyclerView mTransactionsRecyclerView;
@@ -59,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
     private Context mContext;
 
     // The expenses per month
-    private Map<Long, Float> mTransactionsPerMonth;
+    private HashMap<Long, Float> mTransactionsPerMonth;
     private List<ITransactions> mTransactionsList;
     private TransactionsListAdapter mTransactionsListAdapter;
     private LinearLayoutManager mLinearLayoutManager;
@@ -188,6 +195,40 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuItem showMonthlyGraphMenuItem = menu.add(Menu.NONE, MENU_ITEM_SHOW_MONTHLY_GRAPH_ID, Menu
+            .NONE, R.string.action_bar_show_monthly_graph)
+            .setIcon(R.drawable.ic_action_show_monthly_graph);
+        showMonthlyGraphMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case MENU_ITEM_SHOW_MONTHLY_GRAPH_ID:
+                showMonthlyGraphs();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void showMonthlyGraphs() {
+        // If the data is not ready, don't do anything
+        if (mTransactionsPerMonth == null || mTransactionsPerMonth.isEmpty()) {
+            Log.w(TAG, "Trying to check the monthly transactions when the data is not ready");
+            return;
+        }
+
+        Intent startMonthlyExpensesActivityIntent = new Intent(mContext, MonthlyTransactionsActivity.class);
+        startMonthlyExpensesActivityIntent.putExtra(MonthlyTransactionsActivity.INTENT_KEY_MONTHLY_TRANSACTIONS,
+            mTransactionsPerMonth);
+        startActivity(startMonthlyExpensesActivityIntent);
+        return;
+    }
+
     // TODO: Use database instead
     private Map<String, Company> generateComapniesList() {
         Map<String, Company> companiesMap = new HashMap<>();
@@ -306,8 +347,6 @@ public class MainActivity extends AppCompatActivity {
         companyId = "BERSHKA-FAMA TRADING,DUBAI-AE";
         company = new Company(companyId, "Bershka");
         companiesMap.put(companyId, company);
-
-
 
         return companiesMap;
     }
