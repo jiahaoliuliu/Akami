@@ -35,6 +35,8 @@ public class Withdraw implements ITransactions {
 
     private Date date;
 
+    private Currency currency;
+
     private float quantity;
 
     private String account;
@@ -71,14 +73,23 @@ public class Withdraw implements ITransactions {
         // Id
         this.id = sms.getId();
 
+        // Currency
+        String currencyAndQuantity = matcher.group(1);
+
+        // The first three characters are the currency
+        this.currency = Currency.toCurrency(currencyAndQuantity.substring(0, 3));
+
         // Quantity
         try {
-            this.quantity = Float.parseFloat(matcher.group(1));
+            this.quantity = Float.parseFloat(currencyAndQuantity.substring(3));
         } catch (NumberFormatException numberFormatException) {
-            throw new IllegalArgumentException("Error parsing the quantity " + matcher.group(1));
+            throw new IllegalArgumentException("Error parsing the quantity " + currencyAndQuantity.substring(3));
         }
 
+        // Account
         this.account = matcher.group(2);
+
+        // Date
         try {
             this.date = DATE_FORMATTER_WITHDRAW_1.parse(matcher.group(3));
         } catch (ParseException parseException) {
@@ -86,6 +97,8 @@ public class Withdraw implements ITransactions {
             Log.w(TAG, "Error parsing the date \"" + matcher.group(3) + "\"");
             this.date = sms.getDate();
         }
+
+        // Branch
         this.branch = matcher.group(4);
     }
 
@@ -99,14 +112,23 @@ public class Withdraw implements ITransactions {
         // Id
         this.id = sms.getId();
 
+        // Currency
+        String currencyAndQuantity = matcher.group(1);
+
+        // The first three characters are the currency
+        this.currency = Currency.toCurrency(currencyAndQuantity.substring(0, 3));
+
         // Quantity
         try {
-            this.quantity = Float.parseFloat(matcher.group(1));
+            this.quantity = Float.parseFloat(currencyAndQuantity.substring(3));
         } catch (NumberFormatException numberFormatException) {
-            throw new IllegalArgumentException("Error parsing the quantity " + matcher.group(1));
+            throw new IllegalArgumentException("Error parsing the quantity " + currencyAndQuantity.substring(3));
         }
 
+        // Account
         this.account = matcher.group(2);
+
+        // Date
         try {
             this.date = DATE_FORMATTER_WITHDRAW_2.parse(matcher.group(3));
         } catch (ParseException parseException) {
@@ -114,6 +136,8 @@ public class Withdraw implements ITransactions {
             Log.w(TAG, "Error parsing the date \"" + matcher.group(3) + "\"");
             this.date = sms.getDate();
         }
+
+        // Branch
         this.branch = matcher.group(4);
     }
 
@@ -128,8 +152,13 @@ public class Withdraw implements ITransactions {
     }
 
     @Override
+    public Currency getCurrency() {
+        return currency;
+    }
+
+    @Override
     public float getQuantity() {
-        return quantity;
+        return quantity * currency.getExchangeRate();
     }
 
     @Override
@@ -164,12 +193,11 @@ public class Withdraw implements ITransactions {
 
         Withdraw withdraw = (Withdraw) o;
 
-        if (Float.compare(withdraw.getQuantity(), getQuantity()) != 0) return false;
-        if (isFirstTransactionOfTheMonth() != withdraw.isFirstTransactionOfTheMonth()) return false;
-        if (getId() != null ? !getId().equals(withdraw.getId()) : withdraw.getId() != null)
-            return false;
-        if (getDate() != null ? !getDate().equals(withdraw.getDate()) : withdraw.getDate() != null)
-            return false;
+        if (Float.compare(withdraw.quantity, quantity) != 0) return false;
+        if (isFirstTransactionOfTheMonth != withdraw.isFirstTransactionOfTheMonth) return false;
+        if (id != null ? !id.equals(withdraw.id) : withdraw.id != null) return false;
+        if (date != null ? !date.equals(withdraw.date) : withdraw.date != null) return false;
+        if (currency != withdraw.currency) return false;
         if (account != null ? !account.equals(withdraw.account) : withdraw.account != null)
             return false;
         return branch != null ? branch.equals(withdraw.branch) : withdraw.branch == null;
@@ -178,12 +206,13 @@ public class Withdraw implements ITransactions {
 
     @Override
     public int hashCode() {
-        int result = getId() != null ? getId().hashCode() : 0;
-        result = 31 * result + (getDate() != null ? getDate().hashCode() : 0);
-        result = 31 * result + (getQuantity() != +0.0f ? Float.floatToIntBits(getQuantity()) : 0);
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (date != null ? date.hashCode() : 0);
+        result = 31 * result + (currency != null ? currency.hashCode() : 0);
+        result = 31 * result + (quantity != +0.0f ? Float.floatToIntBits(quantity) : 0);
         result = 31 * result + (account != null ? account.hashCode() : 0);
         result = 31 * result + (branch != null ? branch.hashCode() : 0);
-        result = 31 * result + (isFirstTransactionOfTheMonth() ? 1 : 0);
+        result = 31 * result + (isFirstTransactionOfTheMonth ? 1 : 0);
         return result;
     }
 
@@ -192,6 +221,7 @@ public class Withdraw implements ITransactions {
         return "Withdraw{" +
                 "id='" + id + '\'' +
                 ", date=" + date +
+                ", currency=" + currency +
                 ", quantity=" + quantity +
                 ", account='" + account + '\'' +
                 ", branch='" + branch + '\'' +

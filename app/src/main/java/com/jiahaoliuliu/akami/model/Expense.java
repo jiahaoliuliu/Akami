@@ -1,5 +1,7 @@
 package com.jiahaoliuliu.akami.model;
 
+import android.util.Log;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -21,6 +23,8 @@ public class Expense implements ITransactions {
     private String id;
 
     private Date date;
+
+    private Currency currency;
 
     private float quantity;
 
@@ -54,11 +58,17 @@ public class Expense implements ITransactions {
         // Id
         this.id = sms.getId();
 
+        // Currency
+        String currencyAndQuantity = matcher.group(1);
+
+        // The first three characters are the currency
+        this.currency = Currency.toCurrency(currencyAndQuantity.substring(0, 3));
+
         // Quantity
         try {
-            this.quantity = Float.parseFloat(matcher.group(1));
+            this.quantity = Float.parseFloat(currencyAndQuantity.substring(3));
         } catch (NumberFormatException numberFormatException) {
-            throw new IllegalArgumentException("Error parsing the quantity " + matcher.group(1));
+            throw new IllegalArgumentException("Error parsing the quantity " + currencyAndQuantity.substring(3));
         }
 
         this.creditCard = matcher.group(2);
@@ -82,8 +92,13 @@ public class Expense implements ITransactions {
     }
 
     @Override
+    public Currency getCurrency() {
+        return currency;
+    }
+
+    @Override
     public float getQuantity() {
-        return quantity;
+        return quantity * currency.getExchangeRate();
     }
 
     @Override
@@ -117,12 +132,11 @@ public class Expense implements ITransactions {
 
         Expense expense = (Expense) o;
 
-        if (Float.compare(expense.getQuantity(), getQuantity()) != 0) return false;
-        if (isFirstTransactionOfTheMonth() != expense.isFirstTransactionOfTheMonth()) return false;
-        if (getId() != null ? !getId().equals(expense.getId()) : expense.getId() != null)
-            return false;
-        if (getDate() != null ? !getDate().equals(expense.getDate()) : expense.getDate() != null)
-            return false;
+        if (Float.compare(expense.quantity, quantity) != 0) return false;
+        if (isFirstTransactionOfTheMonth != expense.isFirstTransactionOfTheMonth) return false;
+        if (id != null ? !id.equals(expense.id) : expense.id != null) return false;
+        if (date != null ? !date.equals(expense.date) : expense.date != null) return false;
+        if (currency != expense.currency) return false;
         if (creditCard != null ? !creditCard.equals(expense.creditCard) : expense.creditCard != null)
             return false;
         return companyId != null ? companyId.equals(expense.companyId) : expense.companyId == null;
@@ -131,12 +145,13 @@ public class Expense implements ITransactions {
 
     @Override
     public int hashCode() {
-        int result = getId() != null ? getId().hashCode() : 0;
-        result = 31 * result + (getDate() != null ? getDate().hashCode() : 0);
-        result = 31 * result + (getQuantity() != +0.0f ? Float.floatToIntBits(getQuantity()) : 0);
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (date != null ? date.hashCode() : 0);
+        result = 31 * result + (currency != null ? currency.hashCode() : 0);
+        result = 31 * result + (quantity != +0.0f ? Float.floatToIntBits(quantity) : 0);
         result = 31 * result + (creditCard != null ? creditCard.hashCode() : 0);
         result = 31 * result + (companyId != null ? companyId.hashCode() : 0);
-        result = 31 * result + (isFirstTransactionOfTheMonth() ? 1 : 0);
+        result = 31 * result + (isFirstTransactionOfTheMonth ? 1 : 0);
         return result;
     }
 
@@ -145,6 +160,7 @@ public class Expense implements ITransactions {
         return "Expense{" +
                 "id='" + id + '\'' +
                 ", date=" + date +
+                ", currency=" + currency +
                 ", quantity=" + quantity +
                 ", creditCard='" + creditCard + '\'' +
                 ", companyId='" + companyId + '\'' +
