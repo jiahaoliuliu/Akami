@@ -101,11 +101,11 @@ public class MainActivity extends AppCompatActivity {
         // Create the list of companies
         mCompaniesMap = generateComapniesList();
 
-        // Parse the list of expenses from the device
-        parseExpenses();
+        // Parse the list of transactions from the device
+        parseTransactions();
     }
 
-    private void parseExpenses() {
+    private void parseTransactions() {
         Cursor cursor = getContentResolver().query(Uri.parse("content://sms/inbox"), PROJECTION, SELECTION_CLAUSE, SELECTION_ARGS, SORT_ORDER);
         if (cursor.moveToFirst()) {
             mTransactionsList = new ArrayList<ITransactions>(cursor.getCount());
@@ -121,15 +121,11 @@ public class MainActivity extends AppCompatActivity {
                             case EXPENSE_1:
                             case EXPENSE_2:
                                 Expense expense = new Expense(sms);
-                                updateTransactionsPerMonth(expense);
                                 mTransactionsList.add(expense);
-//                                Log.v(TAG, "Expense parsed " + expense);
                                 break;
                             case WITHDRAW_1:
                             case WITHDRAW_2:
                                 Withdraw withdraw = new Withdraw(sms);
-//                                Log.v(TAG, "Withdraw parsed " + withdraw);
-                                updateTransactionsPerMonth(withdraw);
                                 mTransactionsList.add(withdraw);
                                 break;
                             case UNKNOWN:
@@ -145,6 +141,11 @@ public class MainActivity extends AppCompatActivity {
                 }
             } while (cursor.moveToNext());
             cursor.close();
+
+            // Update the transactions per month
+            for (ITransactions transactions : mTransactionsList) {
+                updateTransactionsPerMonth(transactions);
+            }
 
             mTransactionsRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener(){
                 @Override
