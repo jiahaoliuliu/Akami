@@ -269,6 +269,11 @@ public class MainActivity extends AppCompatActivity {
         company.setImageResourceId(R.drawable.logo_spinneys);
         companiesMap.put(companyId, company);
 
+        companyId = "SPINNEYS DUBAI LLC,DUBAI-AE";
+        company = new Company(companyId, "Spinneys");
+        company.setImageResourceId(R.drawable.logo_spinneys);
+        companiesMap.put(companyId, company);
+
         // Media one hotel
         companyId = "MEDIA ONE HOTEL,DUBAI-AE";
         company = new Company(companyId, "Media one hotel");
@@ -283,6 +288,12 @@ public class MainActivity extends AppCompatActivity {
 
         // RTA
         companyId = "RTA-TOM,DUBAI-AE";
+        company = new Company(companyId, "RTA");
+        company.setImageResourceId(R.drawable.logo_rta);
+        companiesMap.put(companyId, company);
+
+        // RTA
+        companyId = "ROAD & TRANSPORT AUT,DUBAI-AE";
         company = new Company(companyId, "RTA");
         company.setImageResourceId(R.drawable.logo_rta);
         companiesMap.put(companyId, company);
@@ -347,6 +358,32 @@ public class MainActivity extends AppCompatActivity {
         // Bershka
         companyId = "BERSHKA-FAMA TRADING,DUBAI-AE";
         company = new Company(companyId, "Bershka");
+        companiesMap.put(companyId, company);
+
+        // Careem
+        companyId = "CAREEM NETWORKS FZ L,DUBAI-AE";
+        company = new Company(companyId, "Careem");
+        company.setImageResourceId(R.drawable.logo_careem);
+        companiesMap.put(companyId, company);
+
+        // Zoom
+        companyId = "SITE 6549 ZOOM MARKE,DUBAI-AE";
+        company = new Company(companyId, "Zoom");
+        companiesMap.put(companyId, company);
+
+        // Air france
+        companyId = "AIR FRANCE,ROISSY CDG CE-FR";
+        company = new Company(companyId, "Air France");
+        companiesMap.put(companyId, company);
+
+        // Microless Computer
+        companyId = "MICROLESS DMCC,DUBAI-AE";
+        company = new Company(companyId, "Microless computer");
+        companiesMap.put(companyId, company);
+
+        // Express VPN
+        companyId = "EXPRESS VPN,310-601-8492-US";
+        company = new Company(companyId, "Express VPN");
         companiesMap.put(companyId, company);
 
         return companiesMap;
