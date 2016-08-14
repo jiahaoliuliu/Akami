@@ -113,7 +113,15 @@ public class TransactionsListAdapter extends RecyclerView.Adapter<TransactionsLi
                 holder.mSourceLogoImageView.setVisibility(View.VISIBLE);
                 break;
         }
-        holder.mQuantityTextView.setText(String.format("%.02f", transaction.getQuantity()) + " " + mContext.getResources().getString(R.string.currency_aed));
+
+        String quantity = String.format("%.02f", transaction.getQuantity()) + " " + mContext.getResources().getString(R.string.currency_aed);
+
+        // If the
+        if (transaction.getCurrency() != ITransactions.Currency.DIRHAMS) {
+            quantity += " (" + String.format("%.02f", transaction.getOriginalCurrencyQuantity()) + " " + transaction.getCurrency().getCode() + ")";
+        }
+
+        holder.mQuantityTextView.setText(quantity);
         holder.mDateTextView.setText(mSimpleDateFormatter.format(transaction.getDate()));
     }
 
