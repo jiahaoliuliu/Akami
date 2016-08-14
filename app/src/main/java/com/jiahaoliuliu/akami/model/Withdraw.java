@@ -162,6 +162,11 @@ public class Withdraw implements ITransactions {
     }
 
     @Override
+    public float getOriginalCurrencyQuantity() {
+        return quantity;
+    }
+
+    @Override
     public String getSource() {
         return account;
     }

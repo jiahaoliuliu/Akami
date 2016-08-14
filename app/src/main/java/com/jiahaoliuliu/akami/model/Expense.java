@@ -102,6 +102,11 @@ public class Expense implements ITransactions {
     }
 
     @Override
+    public float getOriginalCurrencyQuantity() {
+        return quantity;
+    }
+
+    @Override
     public String getSource() {
         return creditCard;
     }
