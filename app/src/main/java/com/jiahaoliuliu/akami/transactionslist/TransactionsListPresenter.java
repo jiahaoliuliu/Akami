@@ -1,4 +1,4 @@
-package com.jiahaoliuliu.akami.expenseslist;
+package com.jiahaoliuliu.akami.transactionslist;
 
 import com.jiahaoliuliu.akami.model.Company;
 
@@ -8,13 +8,13 @@ import java.util.Map;
  * Created by jiahaoliuliu on 7/7/17.
  */
 
-public class ExpensesListPresenter implements ExpensesListContract.Presenter {
+public class TransactionsListPresenter implements TransactionsListContract.Presenter {
 
-    private ExpensesListContract.Model mModel;
+    private TransactionsListContract.Model mModel;
 
-    public ExpensesListPresenter() {
+    public TransactionsListPresenter() {
         super();
-        mModel = new ExpensesListModel();
+        mModel = new TransactionsListModel();
     }
 
     @Override

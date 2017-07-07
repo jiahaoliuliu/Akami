@@ -1,4 +1,4 @@
-package com.jiahaoliuliu.akami.expenseslist;
+package com.jiahaoliuliu.akami.transactionslist;
 
 import com.jiahaoliuliu.akami.R;
 import com.jiahaoliuliu.akami.model.Company;
@@ -10,12 +10,12 @@ import java.util.Map;
  * Created by jiahaoliuliu on 7/7/17.
  */
 
-public class ExpensesListModel implements ExpensesListContract.Model {
+public class TransactionsListModel implements TransactionsListContract.Model {
 
     // The list of companies
     private Map<String, Company> mCompaniesMap;
 
-    public ExpensesListModel() {
+    public TransactionsListModel() {
         // Create the list of companies
         mCompaniesMap = generateComapniesList();
     }

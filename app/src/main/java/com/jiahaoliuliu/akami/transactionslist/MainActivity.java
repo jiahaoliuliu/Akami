@@ -1,6 +1,5 @@
-package com.jiahaoliuliu.akami.expenseslist;
+package com.jiahaoliuliu.akami.transactionslist;
 
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -15,7 +14,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.jiahaoliuliu.akami.R;
-import com.jiahaoliuliu.akami.model.Company;
 import com.jiahaoliuliu.akami.model.Expense;
 import com.jiahaoliuliu.akami.model.Sms;
 import com.jiahaoliuliu.akami.model.ITransactions;
@@ -31,10 +29,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class MainActivity extends BaseActivity
-        implements ExpensesListContract.View, BaseView {
+        implements TransactionsListContract.View, BaseView {
 
     private static final String TAG = "MainActivity";
     private static final int MENU_ITEM_SHOW_MONTHLY_GRAPH_ID = 1000;
@@ -78,14 +75,14 @@ public class MainActivity extends BaseActivity
     // The month of the first element shown in the header
     private long mFirstElementMonthlyKey;
 
-    private ExpensesListPresenter mPresenter;
+    private TransactionsListPresenter mPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // Set the base presenter for the base view and for this view
         // This should be done before the method onCreated because
         // it is linked on the lifecycle of the application
-        mPresenter = (ExpensesListPresenter) getPresenter();
+        mPresenter = (TransactionsListPresenter) getPresenter();
         setPresenter(mPresenter);
 
         super.onCreate(savedInstanceState);
@@ -239,6 +236,6 @@ public class MainActivity extends BaseActivity
     // TODO: Use Dagger instead
     @Override
     public BasePresenter getPresenter() {
-        return new ExpensesListPresenter();
+        return new TransactionsListPresenter();
     }
 }

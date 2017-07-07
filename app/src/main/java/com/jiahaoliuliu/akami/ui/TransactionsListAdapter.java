@@ -12,7 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.jiahaoliuliu.akami.R;
-import com.jiahaoliuliu.akami.expenseslist.MainActivity;
+import com.jiahaoliuliu.akami.transactionslist.MainActivity;
 import com.jiahaoliuliu.akami.model.Company;
 import com.jiahaoliuliu.akami.model.ITransactions;
 import com.jiahaoliuliu.akami.model.Withdraw;
