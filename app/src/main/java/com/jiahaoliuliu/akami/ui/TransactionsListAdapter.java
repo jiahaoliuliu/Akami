@@ -59,19 +59,20 @@ public class TransactionsListAdapter extends RecyclerView.Adapter<TransactionsLi
     public void onBindViewHolder(ViewHolder holder, int position) {
         final ITransactions transaction = mTransactionsList.get(position);
 
-        // Set the header
-        if (transaction.isFirstTransactionOfTheMonth() && position != 0) {
-            holder.mHeaderLinearLayout.setVisibility(View.VISIBLE);
-            long currentMonthlyKey = HeaderUtility.getHeaderMonthlyKeyByTransaction(transaction);
-            // Set the month
-            holder.mHeaderDateTextView.setText(MainActivity.sHeaderDateFormatter.format(transaction.getDate()));
-
-            // Set the quantity
-            holder.mHeaderQuantityTextView.setText(String.format("%.02f", mTransactionsPerMonth.get(currentMonthlyKey))
-                    + " " + mContext.getResources().getString(R.string.currency_aed));
-        } else {
-            holder.mHeaderLinearLayout.setVisibility(View.GONE);
-        }
+        // TODO: Uncomment this
+//        // Set the header
+//        if (transaction.isFirstTransactionOfTheMonth() && position != 0) {
+//            holder.mHeaderLinearLayout.setVisibility(View.VISIBLE);
+//            long currentMonthlyKey = HeaderUtility.getHeaderMonthlyKeyByTransaction(transaction);
+//            // Set the month
+//            holder.mHeaderDateTextView.setText(MainActivity.sHeaderDateFormatter.format(transaction.getDate()));
+//
+//            // Set the quantity
+//            holder.mHeaderQuantityTextView.setText(String.format("%.02f", mTransactionsPerMonth.get(currentMonthlyKey))
+//                    + " " + mContext.getResources().getString(R.string.currency_aed));
+//        } else {
+//            holder.mHeaderLinearLayout.setVisibility(View.GONE);
+//        }
 
         // Set the content
         // TODO: Create different view for Withdraws
@@ -151,10 +152,11 @@ public class TransactionsListAdapter extends RecyclerView.Adapter<TransactionsLi
 
         public ViewHolder(View view) {
             super(view);
+            // TODO: Uncomment this
             // Header
-            this.mHeaderLinearLayout = (LinearLayout) view.findViewById(R.id.header_linear_layout);
-            this.mHeaderDateTextView = (TextView) view.findViewById(R.id.header_date_text_view);
-            this.mHeaderQuantityTextView = (TextView) view.findViewById(R.id.header_quantity_text_view);
+//            this.mHeaderLinearLayout = (LinearLayout) view.findViewById(R.id.header_linear_layout);
+//            this.mHeaderDateTextView = (TextView) view.findViewById(R.id.header_date_text_view);
+//            this.mHeaderQuantityTextView = (TextView) view.findViewById(R.id.header_quantity_text_view);
 
             // Content
             this.mSourceTextView = (TextView) view.findViewById(R.id.source_text_view);

@@ -1,8 +1,6 @@
 package com.jiahaoliuliu.akami.transactionslist;
 
 import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,21 +12,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.jiahaoliuliu.akami.R;
-import com.jiahaoliuliu.akami.model.Expense;
-import com.jiahaoliuliu.akami.model.Sms;
-import com.jiahaoliuliu.akami.model.ITransactions;
-import com.jiahaoliuliu.akami.model.Withdraw;
 import com.jiahaoliuliu.akami.modelviewpresenter.BaseActivity;
 import com.jiahaoliuliu.akami.modelviewpresenter.BasePresenter;
 import com.jiahaoliuliu.akami.modelviewpresenter.BaseView;
 import com.jiahaoliuliu.akami.ui.MonthlyTransactionsActivity;
 import com.jiahaoliuliu.akami.ui.TransactionsListAdapter;
-import com.jiahaoliuliu.akami.utils.HeaderUtility;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class MainActivity extends BaseActivity
         implements TransactionsListContract.View, BaseView {
@@ -46,9 +37,6 @@ public class MainActivity extends BaseActivity
     private RecyclerView mTransactionsRecyclerView;
     private TextView mNoSmsTextView;
 
-    // The expenses per month
-    private HashMap<Long, Float> mTransactionsPerMonth;
-    private List<ITransactions> mTransactionsList;
     private TransactionsListAdapter mTransactionsListAdapter;
     private LinearLayoutManager mLinearLayoutManager;
 
@@ -71,12 +59,9 @@ public class MainActivity extends BaseActivity
         setContentView(R.layout.activity_main);
 
         linkViews();
-        setViewLogic();
+//        setViewLogic();
 
-        getContentResolver();
-        // Parse the list of transactions from the device
-        parseTransactions();
-        showTransactionsList();
+        mPresenter.onViewCreated(mContext);
     }
 
     private void linkViews() {
@@ -91,55 +76,40 @@ public class MainActivity extends BaseActivity
         mNoSmsTextView = (TextView) findViewById(R.id.no_sms_text_view);
     }
 
-    private void setViewLogic() {
-        // Set the logic for the recycler view
-        mTransactionsRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener(){
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                int firstElementPosition = mLinearLayoutManager.findFirstVisibleItemPosition();
-                ITransactions firstTransaction = mTransactionsList.get(firstElementPosition);
+    // TODO: Check the views
+//    private void setViewLogic() {
+//        // Set the logic for the recycler view
+//        mTransactionsRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener(){
+//            @Override
+//            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+//                super.onScrolled(recyclerView, dx, dy);
+//                int firstElementPosition = mLinearLayoutManager.findFirstVisibleItemPosition();
+//                ITransactions firstTransaction = mTransactionsList.get(firstElementPosition);
+//
+//                // Update the header if needed
+//                long currentMonthlyKey = HeaderUtility.getHeaderMonthlyKeyByTransaction(firstTransaction);
+//                if (currentMonthlyKey != mFirstElementMonthlyKey) {
+//                    // Update the month
+//                    mHeaderDateTextView.setText(sHeaderDateFormatter.format(firstTransaction.getDate()));
+//
+//                    // Update the quantity
+//                    mFirstElementMonthlyKey = currentMonthlyKey;
+//                    mHeaderQuantityTextView.setText(String.format("%.02f", mTransactionsPerMonth.get(mFirstElementMonthlyKey))
+//                            + " " + getResources().getString(R.string.currency_aed));
+//                }
+//            }
+//        });
+//    }
 
-                // Update the header if needed
-                long currentMonthlyKey = HeaderUtility.getHeaderMonthlyKeyByTransaction(firstTransaction);
-                if (currentMonthlyKey != mFirstElementMonthlyKey) {
-                    // Update the month
-                    mHeaderDateTextView.setText(sHeaderDateFormatter.format(firstTransaction.getDate()));
-
-                    // Update the quantity
-                    mFirstElementMonthlyKey = currentMonthlyKey;
-                    mHeaderQuantityTextView.setText(String.format("%.02f", mTransactionsPerMonth.get(mFirstElementMonthlyKey))
-                            + " " + getResources().getString(R.string.currency_aed));
-                }
-            }
-        });
-    }
-
-    private void showTransactionsList() {
-        mTransactionsListAdapter = new TransactionsListAdapter(mContext, mTransactionsList,
-                mPresenter.getCompaniesMap(), mTransactionsPerMonth);
+    @Override
+    public void showTransactionsList(HashMap<Long, Float> transactionsPerMonth) {
+        mTransactionsListAdapter = new TransactionsListAdapter(mContext,
+                mPresenter.getTransactionsList(), mPresenter.getCompaniesMap(),
+                transactionsPerMonth);
         mTransactionsRecyclerView.setAdapter(mTransactionsListAdapter);
 
         // Disable the no sms view
         mNoSmsTextView.setVisibility(View.GONE);
-    }
-
-    private void updateTransactionsPerMonth(ITransactions transaction) {
-        // Intialize expense per month if needed
-        if (mTransactionsPerMonth == null) {
-            mTransactionsPerMonth = new HashMap<>();
-        }
-
-        long key = HeaderUtility.getHeaderMonthlyKeyByTransaction(transaction);
-
-        if (!mTransactionsPerMonth.containsKey(key)) {
-            mTransactionsPerMonth.put(key, 0.00f);
-            transaction.setFirstTransactionOfTheMonth(true);
-        } else {
-            float monthExpense = mTransactionsPerMonth.get(key);
-            monthExpense += transaction.getQuantity();
-            mTransactionsPerMonth.put(key, monthExpense);
-        }
     }
 
     @Override
@@ -155,23 +125,24 @@ public class MainActivity extends BaseActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case MENU_ITEM_SHOW_MONTHLY_GRAPH_ID:
-                showMonthlyGraphs();
+                mPresenter.onShowMonthlyGraphRequested();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    private void showMonthlyGraphs() {
+    @Override
+    public void showMonthlyGraphs(HashMap<Long, Float> transactionsPerMonth) {
         // If the data is not ready, don't do anything
-        if (mTransactionsPerMonth == null || mTransactionsPerMonth.isEmpty()) {
+        if (transactionsPerMonth == null || transactionsPerMonth.isEmpty()) {
             Log.w(TAG, "Trying to check the monthly transactions when the data is not ready");
             return;
         }
 
         Intent startMonthlyExpensesActivityIntent = new Intent(mContext, MonthlyTransactionsActivity.class);
         startMonthlyExpensesActivityIntent.putExtra(MonthlyTransactionsActivity.INTENT_KEY_MONTHLY_TRANSACTIONS,
-            mTransactionsPerMonth);
+                transactionsPerMonth);
         startActivity(startMonthlyExpensesActivityIntent);
         return;
     }
@@ -179,6 +150,6 @@ public class MainActivity extends BaseActivity
     // TODO: Use Dagger instead
     @Override
     public BasePresenter getPresenter() {
-        return new TransactionsListPresenter(mContext);
+        return new TransactionsListPresenter(mContext, this);
     }
 }

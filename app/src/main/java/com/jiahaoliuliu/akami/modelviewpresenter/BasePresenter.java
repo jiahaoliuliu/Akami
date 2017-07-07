@@ -1,5 +1,7 @@
 package com.jiahaoliuliu.akami.modelviewpresenter;
 
+import android.content.Context;
+
 /**
  * The base for all the presenters
  *
@@ -10,8 +12,9 @@ public interface BasePresenter {
     /**
      * Linked with the lifecycle of the view. This is called
      * on onCreate from the view
+     * @param context The context of the application
      */
-    void onViewCreated();
+    void onViewCreated(Context context);
 
     /**
      * Linked with the lifecycle of the view. This is called
