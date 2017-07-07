@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.jiahaoliuliu.akami.R;
@@ -18,7 +17,6 @@ import com.jiahaoliuliu.akami.modelviewpresenter.BaseActivity;
 import com.jiahaoliuliu.akami.modelviewpresenter.BasePresenter;
 import com.jiahaoliuliu.akami.modelviewpresenter.BaseView;
 import com.jiahaoliuliu.akami.ui.MonthlyTransactionsActivity;
-import com.jiahaoliuliu.akami.ui.TransactionsListAdapter;
 import com.jiahaoliuliu.akami.utils.HeaderUtility;
 
 import java.text.SimpleDateFormat;
