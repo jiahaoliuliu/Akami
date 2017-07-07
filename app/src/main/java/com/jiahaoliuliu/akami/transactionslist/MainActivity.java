@@ -55,6 +55,7 @@ public class MainActivity extends BaseActivity
         setContentView(R.layout.activity_main);
 
         mPresenter = (TransactionsListPresenter) getPresenter();
+        mPresenter.setView(this);
         setPresenter(mPresenter);
 
         linkViews();
@@ -152,6 +153,6 @@ public class MainActivity extends BaseActivity
     // TODO: Use Dagger instead
     @Override
     public BasePresenter getPresenter() {
-        return new TransactionsListPresenter(this);
+        return new TransactionsListPresenter();
     }
 }

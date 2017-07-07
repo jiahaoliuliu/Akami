@@ -9,15 +9,22 @@ import android.content.Context;
 public class TransactionsListPresenter implements TransactionsListContract.Presenter {
 
     private Context mContext;
-    private final TransactionsListContract.View mView;
+    private TransactionsListContract.View mView;
 
     /**
      * The model of the MVP. Note this does not exist until the view is created
      */
     private TransactionsListContract.Model mModel;
 
-    public TransactionsListPresenter(TransactionsListContract.View view) {
+    public TransactionsListPresenter() {
         super();
+    }
+
+    /**
+     * This method has been separated from the contructor for better testability
+     * @param view
+     */
+    public void setView(TransactionsListContract.View view) {
         this.mView = view;
     }
 
