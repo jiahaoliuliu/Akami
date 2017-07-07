@@ -2,13 +2,6 @@ package com.jiahaoliuliu.akami.transactionslist;
 
 import android.content.Context;
 
-import com.jiahaoliuliu.akami.model.Company;
-import com.jiahaoliuliu.akami.model.ITransactions;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  * Created by jiahaoliuliu on 7/7/17.
  */
