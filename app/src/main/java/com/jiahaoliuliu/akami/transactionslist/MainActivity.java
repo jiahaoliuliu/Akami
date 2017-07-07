@@ -12,6 +12,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.jiahaoliuliu.akami.R;
+import com.jiahaoliuliu.akami.model.Company;
+import com.jiahaoliuliu.akami.model.ITransactions;
 import com.jiahaoliuliu.akami.modelviewpresenter.BaseActivity;
 import com.jiahaoliuliu.akami.modelviewpresenter.BasePresenter;
 import com.jiahaoliuliu.akami.modelviewpresenter.BaseView;
@@ -20,6 +22,8 @@ import com.jiahaoliuliu.akami.ui.TransactionsListAdapter;
 
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends BaseActivity
         implements TransactionsListContract.View, BaseView {
@@ -59,7 +63,6 @@ public class MainActivity extends BaseActivity
         setContentView(R.layout.activity_main);
 
         linkViews();
-//        setViewLogic();
 
         mPresenter.onViewCreated(mContext);
     }
@@ -102,9 +105,11 @@ public class MainActivity extends BaseActivity
 //    }
 
     @Override
-    public void showTransactionsList(HashMap<Long, Float> transactionsPerMonth) {
+    public void showTransactionsList(List<ITransactions> transactionsList,
+                                     HashMap<Long, Float> transactionsPerMonth,
+                                     Map<String, Company> companiesMap) {
         mTransactionsListAdapter = new TransactionsListAdapter(mContext,
-                mPresenter.getTransactionsList(), mPresenter.getCompaniesMap(),
+                transactionsList, companiesMap,
                 transactionsPerMonth);
         mTransactionsRecyclerView.setAdapter(mTransactionsListAdapter);
 
@@ -150,6 +155,6 @@ public class MainActivity extends BaseActivity
     // TODO: Use Dagger instead
     @Override
     public BasePresenter getPresenter() {
-        return new TransactionsListPresenter(mContext, this);
+        return new TransactionsListPresenter(this);
     }
 }

@@ -33,35 +33,17 @@ public interface TransactionsListContract {
          * @param transactionsPerMonth
          *      The list of transactions per month
          */
-        void showTransactionsList(HashMap<Long, Float> transactionsPerMonth);
+        void showTransactionsList(List<ITransactions> transactionsList,
+                                  HashMap<Long, Float> transactionsPerMonth,
+                                  Map<String, Company> companiesMap);
     }
 
     interface Presenter extends BasePresenter {
 
+        /**
+         * Action triggered when it is required to show the monthly graphs
+         */
         void onShowMonthlyGraphRequested();
-
-        /**
-         * Get the list of companies.
-         * TODO: This shouldn't be visible by the views
-         * @return
-         */
-        Map<String, Company> getCompaniesMap();
-
-        /**
-         * Get the list of transactions from the SMS
-         * TODO: This shouldn't be visible by the views
-         * @return
-         *      The list of the transactions that the user has
-         */
-        List<ITransactions> getTransactionsList();
-
-        /**
-         * Get the list of transactions per month
-         * TODO: This shouldn't be visible by the views
-         * @return
-         *      The list of transactions per month
-         */
-        HashMap<Long, Float> getTransactionsPerMonth();
     }
 
     interface Model {
