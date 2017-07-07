@@ -1,5 +1,7 @@
 package com.jiahaoliuliu.akami.transactionslist;
 
+import android.content.Context;
+
 import com.jiahaoliuliu.akami.model.Company;
 
 import java.util.Map;
@@ -10,11 +12,13 @@ import java.util.Map;
 
 public class TransactionsListPresenter implements TransactionsListContract.Presenter {
 
+    private Context mContext;
     private TransactionsListContract.Model mModel;
 
-    public TransactionsListPresenter() {
+    public TransactionsListPresenter(Context context) {
         super();
-        mModel = new TransactionsListModel();
+        this.mContext = context;
+        mModel = new TransactionsListModel(context);
     }
 
     @Override
@@ -39,7 +43,7 @@ public class TransactionsListPresenter implements TransactionsListContract.Prese
 
 
     @Override
-    public Map<String, Company> getCompaniesList() {
-        return mModel.getCompaniesList();
+    public Map<String, Company> getCompaniesMap() {
+        return mModel.getCompaniesMap();
     }
 }
