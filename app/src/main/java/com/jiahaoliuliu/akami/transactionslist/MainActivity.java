@@ -36,26 +36,8 @@ public class MainActivity extends BaseActivity
     private static final String TAG = "MainActivity";
     private static final int MENU_ITEM_SHOW_MONTHLY_GRAPH_ID = 1000;
 
-    private static final String ADDRESS_ADCB = "ADCBAlert";
-
     // Date to be displayed as header
     private static final String HEADER_DATE_FORMAT = "MMMM yyyy";
-
-    // Projection. The fields of the sms to be returned
-    private static final String[] PROJECTION = {
-//        Sms.COLUMN_ID,
-        Sms.COLUMN_DATE,
-        Sms.COLUMN_BODY
-    };
-
-    // Selection query
-    private static final String SELECTION_CLAUSE = Sms.COLUMN_TYPE + "=? and " + Sms.COLUMN_ADDRESS + "=?";
-
-    // Selection arguments
-    private static final String[] SELECTION_ARGS = {"1", ADDRESS_ADCB};
-
-    // Sort order
-    private static final String SORT_ORDER = Sms.COLUMN_DATE + " DESC";
 
     // Views
     private LinearLayout mHeaderLinearLayout;
@@ -91,6 +73,7 @@ public class MainActivity extends BaseActivity
         linkViews();
         setViewLogic();
 
+        getContentResolver();
         // Parse the list of transactions from the device
         parseTransactions();
         showTransactionsList();
@@ -132,56 +115,9 @@ public class MainActivity extends BaseActivity
         });
     }
 
-    private void parseTransactions() {
-        Cursor cursor = getContentResolver().query(Uri.parse("content://sms/inbox"), PROJECTION, SELECTION_CLAUSE, SELECTION_ARGS, SORT_ORDER);
-        if (cursor.moveToFirst()) {
-            mTransactionsList = new ArrayList<ITransactions>(cursor.getCount());
-            do {
-                try {
-                    Sms sms = new Sms();
-                    //                sms.set_id(cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_ID)));
-                    sms.setDate((cursor.getLong(cursor.getColumnIndexOrThrow(Sms.COLUMN_DATE))));
-                    sms.setBody((cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_BODY))));
-//                    Log.v(TAG, "SMS " + sms);
-                    try {
-                        switch (sms.getType()) {
-                            case EXPENSE_1:
-                            case EXPENSE_2:
-                                Expense expense = new Expense(sms);
-                                mTransactionsList.add(expense);
-                                break;
-                            case WITHDRAW_1:
-                            case WITHDRAW_2:
-                                Withdraw withdraw = new Withdraw(sms);
-                                mTransactionsList.add(withdraw);
-                                break;
-                            case UNKNOWN:
-                                Log.w(TAG, "Sms unknown " + sms.getBody());
-                                break;
-                        }
-                    } catch (IllegalArgumentException illegalArgumentException) {
-                        Log.w(TAG, "transaction unknown " + illegalArgumentException.getMessage());
-                    }
-                // To catch any error on Getting the data from the cursor
-                } catch (IllegalArgumentException illegalArgumentException) {
-                    Log.w(TAG, "Error getting sms message from content resolver ", illegalArgumentException);
-                }
-            } while (cursor.moveToNext());
-            cursor.close();
-
-            // Update the transactions per month
-            for (ITransactions transactions : mTransactionsList) {
-                updateTransactionsPerMonth(transactions);
-            }
-        } else {
-            Log.v(TAG, "The user does not have any sms");
-
-        }
-    }
-
     private void showTransactionsList() {
         mTransactionsListAdapter = new TransactionsListAdapter(mContext, mTransactionsList,
-                mPresenter.getCompaniesList(), mTransactionsPerMonth);
+                mPresenter.getCompaniesMap(), mTransactionsPerMonth);
         mTransactionsRecyclerView.setAdapter(mTransactionsListAdapter);
 
         // Disable the no sms view
@@ -243,6 +179,6 @@ public class MainActivity extends BaseActivity
     // TODO: Use Dagger instead
     @Override
     public BasePresenter getPresenter() {
-        return new TransactionsListPresenter();
+        return new TransactionsListPresenter(mContext);
     }
 }

@@ -1,9 +1,11 @@
 package com.jiahaoliuliu.akami.transactionslist;
 
 import com.jiahaoliuliu.akami.model.Company;
+import com.jiahaoliuliu.akami.model.ITransactions;
 import com.jiahaoliuliu.akami.modelviewpresenter.BasePresenter;
 import com.jiahaoliuliu.akami.modelviewpresenter.BaseView;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,7 +24,7 @@ public interface TransactionsListContract {
          * TODO: This shouldn't be visible by the views
          * @return
          */
-        Map<String, Company> getCompaniesList();
+        Map<String, Company> getCompaniesMap();
     }
 
     interface Model {
@@ -31,6 +33,8 @@ public interface TransactionsListContract {
          * Get the list of companies
          * @return
          */
-        Map<String, Company> getCompaniesList();
+        Map<String, Company> getCompaniesMap();
+
+        List<ITransactions> getTransactionsList();
     }
 }

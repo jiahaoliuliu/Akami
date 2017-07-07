@@ -1,9 +1,20 @@
 package com.jiahaoliuliu.akami.transactionslist;
 
+import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
+import android.util.Log;
+
 import com.jiahaoliuliu.akami.R;
 import com.jiahaoliuliu.akami.model.Company;
+import com.jiahaoliuliu.akami.model.Expense;
+import com.jiahaoliuliu.akami.model.ITransactions;
+import com.jiahaoliuliu.akami.model.Sms;
+import com.jiahaoliuliu.akami.model.Withdraw;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -12,21 +23,101 @@ import java.util.Map;
 
 public class TransactionsListModel implements TransactionsListContract.Model {
 
-    // The list of companies
-    private Map<String, Company> mCompaniesMap;
+    // Projection. The fields of the sms to be returned
+    private static final String[] PROJECTION = {
+//        Sms.COLUMN_ID,
+            Sms.COLUMN_DATE,
+            Sms.COLUMN_BODY
+    };
 
-    public TransactionsListModel() {
-        // Create the list of companies
-        mCompaniesMap = generateComapniesList();
+    // Selection query
+    private static final String SELECTION_CLAUSE = Sms.COLUMN_TYPE + "=? and " + Sms.COLUMN_ADDRESS + "=?";
+
+    private static final String ADDRESS_ADCB = "ADCBAlert";
+
+    // Selection arguments
+    private static final String[] SELECTION_ARGS = {"1", ADDRESS_ADCB};
+
+    // Sort order
+    private static final String SORT_ORDER = Sms.COLUMN_DATE + " DESC";
+
+    // Internal variables
+    private Map<String, Company> mCompaniesMap;
+    private List<ITransactions> mTransactionsList;
+    private Context mContext;
+
+    public TransactionsListModel(Context context) {
+        this.mContext = context;
     }
 
     @Override
-    public Map<String, Company> getCompaniesList() {
+    public Map<String, Company> getCompaniesMap() {
+        if (mCompaniesMap == null) {
+            mCompaniesMap = generateCompaniesMap();
+        }
+
         return mCompaniesMap;
     }
 
+    @Override
+    public List<ITransactions> getTransactionsList() {
+        // TODO: Update the data on real time
+        if (mTransactionsList == null) {
+            mTransactionsList = parseTransactions();
+        }
+
+        return mTransactionsList;
+    }
+
+    private List<ITransactions> parseTransactions() {
+        Cursor cursor = mContext.getContentResolver().query(Uri.parse("content://sms/inbox"), PROJECTION, SELECTION_CLAUSE, SELECTION_ARGS, SORT_ORDER);
+        if (cursor.moveToFirst()) {
+            mTransactionsList = new ArrayList<ITransactions>(cursor.getCount());
+            do {
+                try {
+                    Sms sms = new Sms();
+                    //                sms.set_id(cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_ID)));
+                    sms.setDate((cursor.getLong(cursor.getColumnIndexOrThrow(Sms.COLUMN_DATE))));
+                    sms.setBody((cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_BODY))));
+//                    Log.v(TAG, "SMS " + sms);
+                    try {
+                        switch (sms.getType()) {
+                            case EXPENSE_1:
+                            case EXPENSE_2:
+                                Expense expense = new Expense(sms);
+                                mTransactionsList.add(expense);
+                                break;
+                            case WITHDRAW_1:
+                            case WITHDRAW_2:
+                                Withdraw withdraw = new Withdraw(sms);
+                                mTransactionsList.add(withdraw);
+                                break;
+                            case UNKNOWN:
+                                Log.w(TAG, "Sms unknown " + sms.getBody());
+                                break;
+                        }
+                    } catch (IllegalArgumentException illegalArgumentException) {
+                        Log.w(TAG, "transaction unknown " + illegalArgumentException.getMessage());
+                    }
+                    // To catch any error on Getting the data from the cursor
+                } catch (IllegalArgumentException illegalArgumentException) {
+                    Log.w(TAG, "Error getting sms message from content resolver ", illegalArgumentException);
+                }
+            } while (cursor.moveToNext());
+            cursor.close();
+
+            // Update the transactions per month
+            for (ITransactions transactions : mTransactionsList) {
+                updateTransactionsPerMonth(transactions);
+            }
+        } else {
+            Log.v(TAG, "The user does not have any sms");
+
+        }
+    }
+
     // TODO: Use database instead
-    private Map<String, Company> generateComapniesList() {
+    private Map<String, Company> generateCompaniesMap() {
         Map<String, Company> companiesMap = new HashMap<>();
 
         // Carrefour Mall of Emirates
