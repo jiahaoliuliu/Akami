@@ -24,7 +24,7 @@ public class TransactionsListPresenter implements TransactionsListContract.Prese
     private TransactionsListContract.Model mModel;
 
 
-    public TransactionsListPresenter(Context context, TransactionsListContract.View view) {
+    public TransactionsListPresenter(TransactionsListContract.View view) {
         super();
         this.mView = view;
     }
@@ -34,7 +34,10 @@ public class TransactionsListPresenter implements TransactionsListContract.Prese
         this.mContext = context;
         mModel = new TransactionsListModel(mContext);
         // Show the List of transactions
-        mView.showTransactionsList(mModel.getTransactionsPerMonth());
+        mView.showTransactionsList(
+                mModel.getTransactionsList(),
+                mModel.getTransactionsPerMonth(),
+                mModel.getCompaniesMap());
     }
 
     @Override
@@ -55,20 +58,5 @@ public class TransactionsListPresenter implements TransactionsListContract.Prese
     @Override
     public void onShowMonthlyGraphRequested() {
         mView.showMonthlyGraphs(mModel.getTransactionsPerMonth());
-    }
-
-    @Override
-    public Map<String, Company> getCompaniesMap() {
-        return mModel.getCompaniesMap();
-    }
-
-    @Override
-    public List<ITransactions> getTransactionsList() {
-        return mModel.getTransactionsList();
-    }
-
-    @Override
-    public HashMap<Long, Float> getTransactionsPerMonth() {
-        return mModel.getTransactionsPerMonth();
     }
 }

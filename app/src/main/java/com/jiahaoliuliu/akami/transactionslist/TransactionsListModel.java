@@ -21,7 +21,6 @@ import java.util.Map;
 /**
  * Created by jiahaoliuliu on 7/7/17.
  */
-
 public class TransactionsListModel implements TransactionsListContract.Model {
 
     private static final String TAG = "TransactionsListModel";
@@ -79,6 +78,7 @@ public class TransactionsListModel implements TransactionsListContract.Model {
     }
 
     private List<ITransactions> parseTransactions() {
+        // TODO: Use RxJava here
         List<ITransactions> transactionsList = new ArrayList<>();
         Cursor cursor = mContext.getContentResolver().query(Uri.parse("content://sms/inbox"), PROJECTION, SELECTION_CLAUSE, SELECTION_ARGS, SORT_ORDER);
         if (cursor.moveToFirst()) {
@@ -145,7 +145,7 @@ public class TransactionsListModel implements TransactionsListContract.Model {
         }
     }
 
-    // TODO: Use database instead
+    // TODO: Use database instead -> Realm
     private Map<String, Company> generateCompaniesMap() {
         Map<String, Company> companiesMap = new HashMap<>();
 
