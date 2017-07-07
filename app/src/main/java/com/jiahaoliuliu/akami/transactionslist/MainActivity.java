@@ -88,7 +88,15 @@ public class MainActivity extends BaseActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Link the views
+        linkViews();
+        setViewLogic();
+
+        // Parse the list of transactions from the device
+        parseTransactions();
+        showTransactionsList();
+    }
+
+    private void linkViews() {
         mHeaderDateTextView = (TextView) findViewById(R.id.header_date_text_view);
         mHeaderQuantityTextView = (TextView) findViewById(R.id.header_quantity_text_view);
 
@@ -98,10 +106,30 @@ public class MainActivity extends BaseActivity
         mTransactionsRecyclerView.setLayoutManager(mLinearLayoutManager);
 
         mNoSmsTextView = (TextView) findViewById(R.id.no_sms_text_view);
+    }
 
-        // Parse the list of transactions from the device
-        parseTransactions();
-        showTransactionsList();
+    private void setViewLogic() {
+        // Set the logic for the recycler view
+        mTransactionsRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener(){
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                int firstElementPosition = mLinearLayoutManager.findFirstVisibleItemPosition();
+                ITransactions firstTransaction = mTransactionsList.get(firstElementPosition);
+
+                // Update the header if needed
+                long currentMonthlyKey = HeaderUtility.getHeaderMonthlyKeyByTransaction(firstTransaction);
+                if (currentMonthlyKey != mFirstElementMonthlyKey) {
+                    // Update the month
+                    mHeaderDateTextView.setText(sHeaderDateFormatter.format(firstTransaction.getDate()));
+
+                    // Update the quantity
+                    mFirstElementMonthlyKey = currentMonthlyKey;
+                    mHeaderQuantityTextView.setText(String.format("%.02f", mTransactionsPerMonth.get(mFirstElementMonthlyKey))
+                            + " " + getResources().getString(R.string.currency_aed));
+                }
+            }
+        });
     }
 
     private void parseTransactions() {
@@ -145,27 +173,6 @@ public class MainActivity extends BaseActivity
             for (ITransactions transactions : mTransactionsList) {
                 updateTransactionsPerMonth(transactions);
             }
-
-            mTransactionsRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener(){
-                @Override
-                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                    super.onScrolled(recyclerView, dx, dy);
-                    int firstElementPosition = mLinearLayoutManager.findFirstVisibleItemPosition();
-                    ITransactions firstTransaction = mTransactionsList.get(firstElementPosition);
-
-                    // Update the header if needed
-                    long currentMonthlyKey = HeaderUtility.getHeaderMonthlyKeyByTransaction(firstTransaction);
-                    if (currentMonthlyKey != mFirstElementMonthlyKey) {
-                        // Update the month
-                        mHeaderDateTextView.setText(sHeaderDateFormatter.format(firstTransaction.getDate()));
-
-                        // Update the quantity
-                        mFirstElementMonthlyKey = currentMonthlyKey;
-                        mHeaderQuantityTextView.setText(String.format("%.02f", mTransactionsPerMonth.get(mFirstElementMonthlyKey))
-                                    + " " + getResources().getString(R.string.currency_aed));
-                    }
-                }
-            });
         } else {
             Log.v(TAG, "The user does not have any sms");
 
