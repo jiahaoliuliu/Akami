@@ -6,6 +6,13 @@ package com.jiahaoliuliu.akami.expenseslist;
 
 public class ExpensesListPresenter implements ExpensesListContract.Presenter {
 
+    private ExpensesListContract.Model mModel;
+
+    public ExpensesListPresenter() {
+        super();
+        mModel = new ExpensesListModel();
+    }
+
     @Override
     public void onViewCreated() {
 
@@ -25,4 +32,6 @@ public class ExpensesListPresenter implements ExpensesListContract.Presenter {
     public void onViewDestroyed() {
         // Nothing to do here
     }
+
+
 }
