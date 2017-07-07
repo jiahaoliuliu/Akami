@@ -36,7 +36,6 @@ public class MainActivity extends BaseActivity
     private static final String HEADER_DATE_FORMAT = "MMMM yyyy";
 
     // Views
-    private LinearLayout mHeaderLinearLayout;
     private TextView mHeaderDateTextView;
     private TextView mHeaderQuantityTextView;
     private RecyclerView mTransactionsRecyclerView;
@@ -85,6 +84,7 @@ public class MainActivity extends BaseActivity
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
+                // TODO: This does not work for the last month when scrolls up
                 int firstElementPosition = mLinearLayoutManager.findFirstVisibleItemPosition();
                 ITransactions firstTransaction = transactionsList.get(firstElementPosition);
 

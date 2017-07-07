@@ -16,7 +16,6 @@ public class TransactionsListPresenter implements TransactionsListContract.Prese
      */
     private TransactionsListContract.Model mModel;
 
-
     public TransactionsListPresenter(TransactionsListContract.View view) {
         super();
         this.mView = view;
