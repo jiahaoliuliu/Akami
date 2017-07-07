@@ -1,5 +1,9 @@
 package com.jiahaoliuliu.akami.expenseslist;
 
+import com.jiahaoliuliu.akami.model.Company;
+
+import java.util.Map;
+
 /**
  * Created by jiahaoliuliu on 7/7/17.
  */
@@ -34,4 +38,8 @@ public class ExpensesListPresenter implements ExpensesListContract.Presenter {
     }
 
 
+    @Override
+    public Map<String, Company> getCompaniesList() {
+        return mModel.getCompaniesList();
+    }
 }

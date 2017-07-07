@@ -78,15 +78,15 @@ public class MainActivity extends BaseActivity
     // The month of the first element shown in the header
     private long mFirstElementMonthlyKey;
 
-    private ExpensesListPresenter mPesenter;
+    private ExpensesListPresenter mPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // Set the base presenter for the base view and for this view
         // This should be done before the method onCreated because
         // it is linked on the lifecycle of the application
-        mPesenter = (ExpensesListPresenter) getPresenter();
-        setPresenter(mPesenter);
+        mPresenter = (ExpensesListPresenter) getPresenter();
+        setPresenter(mPresenter);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -104,6 +104,7 @@ public class MainActivity extends BaseActivity
 
         // Parse the list of transactions from the device
         parseTransactions();
+        showTransactionsList();
     }
 
     private void parseTransactions() {
@@ -168,16 +169,19 @@ public class MainActivity extends BaseActivity
                     }
                 }
             });
-            mTransactionsListAdapter = new TransactionsListAdapter(mContext, mTransactionsList,
-                    mPesenter.getCompaniesList(), mTransactionsPerMonth);
-            mTransactionsRecyclerView.setAdapter(mTransactionsListAdapter);
-
-            // Disable the no sms view
-            mNoSmsTextView.setVisibility(View.GONE);
         } else {
             Log.v(TAG, "The user does not have any sms");
 
         }
+    }
+
+    private void showTransactionsList() {
+        mTransactionsListAdapter = new TransactionsListAdapter(mContext, mTransactionsList,
+                mPresenter.getCompaniesList(), mTransactionsPerMonth);
+        mTransactionsRecyclerView.setAdapter(mTransactionsListAdapter);
+
+        // Disable the no sms view
+        mNoSmsTextView.setVisibility(View.GONE);
     }
 
     private void updateTransactionsPerMonth(ITransactions transaction) {
