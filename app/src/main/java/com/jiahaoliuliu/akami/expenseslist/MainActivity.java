@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,6 +20,9 @@ import com.jiahaoliuliu.akami.model.Expense;
 import com.jiahaoliuliu.akami.model.Sms;
 import com.jiahaoliuliu.akami.model.ITransactions;
 import com.jiahaoliuliu.akami.model.Withdraw;
+import com.jiahaoliuliu.akami.modelviewpresenter.BaseActivity;
+import com.jiahaoliuliu.akami.modelviewpresenter.BasePresenter;
+import com.jiahaoliuliu.akami.modelviewpresenter.BaseView;
 import com.jiahaoliuliu.akami.ui.MonthlyTransactionsActivity;
 import com.jiahaoliuliu.akami.ui.TransactionsListAdapter;
 import com.jiahaoliuliu.akami.utils.HeaderUtility;
@@ -31,7 +33,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity
+        implements ExpensesListContract.View, BaseView {
 
     private static final String TAG = "MainActivity";
     private static final int MENU_ITEM_SHOW_MONTHLY_GRAPH_ID = 1000;
@@ -81,8 +84,16 @@ public class MainActivity extends AppCompatActivity {
     // The month of the first element shown in the header
     private long mFirstElementMonthlyKey;
 
+    private ExpensesListPresenter mExpensesListPresenter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Set the base presenter for the base view and for this view
+        // This should be done before the method onCreated because
+        // it is linked on the lifecycle of the application
+        mExpensesListPresenter = (ExpensesListPresenter) getPresenter();
+        setPresenter(mExpensesListPresenter);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -391,4 +402,9 @@ public class MainActivity extends AppCompatActivity {
         return companiesMap;
     }
 
+    // TODO: Use Dagger instead
+    @Override
+    public BasePresenter getPresenter() {
+        return new ExpensesListPresenter();
+    }
 }
