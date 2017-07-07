@@ -1,4 +1,4 @@
-package com.jiahaoliuliu.akami.ui;
+package com.jiahaoliuliu.akami.expenseslist;
 
 import android.content.Context;
 import android.content.Intent;
@@ -21,6 +21,8 @@ import com.jiahaoliuliu.akami.model.Expense;
 import com.jiahaoliuliu.akami.model.Sms;
 import com.jiahaoliuliu.akami.model.ITransactions;
 import com.jiahaoliuliu.akami.model.Withdraw;
+import com.jiahaoliuliu.akami.ui.MonthlyTransactionsActivity;
+import com.jiahaoliuliu.akami.ui.TransactionsListAdapter;
 import com.jiahaoliuliu.akami.utils.HeaderUtility;
 
 import java.text.SimpleDateFormat;
