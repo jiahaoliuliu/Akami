@@ -34,6 +34,9 @@ public interface TransactionsListContract {
         void showTransactionsList(List<ITransactions> transactionsList,
                                   HashMap<Long, Float> transactionsPerMonth,
                                   Map<String, Company> companiesMap);
+
+        void setupHeader(List<ITransactions> transactionsList,
+                         HashMap<Long, Float> transactionsPerMonth);
     }
 
     interface Presenter extends BasePresenter {

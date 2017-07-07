@@ -19,6 +19,7 @@ import com.jiahaoliuliu.akami.modelviewpresenter.BasePresenter;
 import com.jiahaoliuliu.akami.modelviewpresenter.BaseView;
 import com.jiahaoliuliu.akami.ui.MonthlyTransactionsActivity;
 import com.jiahaoliuliu.akami.ui.TransactionsListAdapter;
+import com.jiahaoliuliu.akami.utils.HeaderUtility;
 
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -53,7 +54,6 @@ public class MainActivity extends BaseActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -77,30 +77,31 @@ public class MainActivity extends BaseActivity
         mNoSmsTextView = (TextView) findViewById(R.id.no_sms_text_view);
     }
 
-    // TODO: Check the views
-//    private void setViewLogic() {
-//        // Set the logic for the recycler view
-//        mTransactionsRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener(){
-//            @Override
-//            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-//                super.onScrolled(recyclerView, dx, dy);
-//                int firstElementPosition = mLinearLayoutManager.findFirstVisibleItemPosition();
-//                ITransactions firstTransaction = mTransactionsList.get(firstElementPosition);
-//
-//                // Update the header if needed
-//                long currentMonthlyKey = HeaderUtility.getHeaderMonthlyKeyByTransaction(firstTransaction);
-//                if (currentMonthlyKey != mFirstElementMonthlyKey) {
-//                    // Update the month
-//                    mHeaderDateTextView.setText(sHeaderDateFormatter.format(firstTransaction.getDate()));
-//
-//                    // Update the quantity
-//                    mFirstElementMonthlyKey = currentMonthlyKey;
-//                    mHeaderQuantityTextView.setText(String.format("%.02f", mTransactionsPerMonth.get(mFirstElementMonthlyKey))
-//                            + " " + getResources().getString(R.string.currency_aed));
-//                }
-//            }
-//        });
-//    }
+    @Override
+    public void setupHeader(final List<ITransactions> transactionsList,
+                              final HashMap<Long, Float> transactionsPerMonth) {
+        // Set the logic for the recycler view
+        mTransactionsRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener(){
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                int firstElementPosition = mLinearLayoutManager.findFirstVisibleItemPosition();
+                ITransactions firstTransaction = transactionsList.get(firstElementPosition);
+
+                // Update the header if needed
+                long currentMonthlyKey = HeaderUtility.getHeaderMonthlyKeyByTransaction(firstTransaction);
+                if (currentMonthlyKey != mFirstElementMonthlyKey) {
+                    // Update the month
+                    mHeaderDateTextView.setText(sHeaderDateFormatter.format(firstTransaction.getDate()));
+
+                    // Update the quantity
+                    mFirstElementMonthlyKey = currentMonthlyKey;
+                    mHeaderQuantityTextView.setText(String.format("%.02f", transactionsPerMonth.get(mFirstElementMonthlyKey))
+                            + " " + getResources().getString(R.string.currency_aed));
+                }
+            }
+        });
+    }
 
     @Override
     public void showTransactionsList(List<ITransactions> transactionsList,
