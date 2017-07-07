@@ -27,10 +27,9 @@ public class TransactionsListPresenter implements TransactionsListContract.Prese
         this.mContext = context;
         mModel = new TransactionsListModel(mContext);
         // Show the List of transactions
-        mView.showTransactionsList(
-                mModel.getTransactionsList(),
-                mModel.getTransactionsPerMonth(),
-                mModel.getCompaniesMap());
+        mView.showTransactionsList(mModel.getTransactionsList(),
+                mModel.getTransactionsPerMonth(), mModel.getCompaniesMap());
+        mView.setupHeader(mModel.getTransactionsList(), mModel.getTransactionsPerMonth());
     }
 
     @Override
