@@ -1,53 +1,41 @@
-package com.jiahaoliuliu.akami.ui;
+package com.jiahaoliuliu.akami.transactionslist;
 
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.jiahaoliuliu.akami.R;
 import com.jiahaoliuliu.akami.model.Company;
 import com.jiahaoliuliu.akami.model.Expense;
-import com.jiahaoliuliu.akami.model.Sms;
 import com.jiahaoliuliu.akami.model.ITransactions;
+import com.jiahaoliuliu.akami.model.Sms;
 import com.jiahaoliuliu.akami.model.Withdraw;
 import com.jiahaoliuliu.akami.utils.HeaderUtility;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity {
+/**
+ * Created by jiahaoliuliu on 7/7/17.
+ */
+public class TransactionsListModel implements TransactionsListContract.Model {
 
-    private static final String TAG = "MainActivity";
-    private static final int MENU_ITEM_SHOW_MONTHLY_GRAPH_ID = 1000;
-
-    private static final String ADDRESS_ADCB = "ADCBAlert";
-
-    // Date to be displayed as header
-    private static final String HEADER_DATE_FORMAT = "MMMM yyyy";
+    private static final String TAG = "TransactionsListModel";
 
     // Projection. The fields of the sms to be returned
     private static final String[] PROJECTION = {
 //        Sms.COLUMN_ID,
-        Sms.COLUMN_DATE,
-        Sms.COLUMN_BODY
+            Sms.COLUMN_DATE,
+            Sms.COLUMN_BODY
     };
 
     // Selection query
     private static final String SELECTION_CLAUSE = Sms.COLUMN_TYPE + "=? and " + Sms.COLUMN_ADDRESS + "=?";
+
+    private static final String ADDRESS_ADCB = "ADCBAlert";
 
     // Selection arguments
     private static final String[] SELECTION_ARGS = {"1", ADDRESS_ADCB};
@@ -55,60 +43,45 @@ public class MainActivity extends AppCompatActivity {
     // Sort order
     private static final String SORT_ORDER = Sms.COLUMN_DATE + " DESC";
 
-    // Views
-    private LinearLayout mHeaderLinearLayout;
-    private TextView mHeaderDateTextView;
-    private TextView mHeaderQuantityTextView;
-    private RecyclerView mTransactionsRecyclerView;
-    private TextView mNoSmsTextView;
-
     // Internal variables
+    private Map<String, Company> mCompaniesMap;
+    private List<ITransactions> mTransactionsList;
+    private HashMap<Long, Float> mTransactionsPerMonth;
     private Context mContext;
 
-    // The expenses per month
-    private HashMap<Long, Float> mTransactionsPerMonth;
-    private List<ITransactions> mTransactionsList;
-    private TransactionsListAdapter mTransactionsListAdapter;
-    private LinearLayoutManager mLinearLayoutManager;
-
-    // The list of companies
-    private Map<String, Company> mCompaniesMap;
-
-    // The header date formatter. This has to be static in order to be used by the adapter
-    public static SimpleDateFormat sHeaderDateFormatter = new SimpleDateFormat(HEADER_DATE_FORMAT);
-    // The month of the first element shown in the header
-    private long mFirstElementMonthlyKey;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        // Set variables
-        this.mContext = this;
-
-        // Link the views
-        mHeaderDateTextView = (TextView) findViewById(R.id.header_date_text_view);
-        mHeaderQuantityTextView = (TextView) findViewById(R.id.header_quantity_text_view);
-
-        mTransactionsRecyclerView = (RecyclerView) findViewById(R.id.transactions_recycler_view);
-        mTransactionsRecyclerView.setHasFixedSize(true);
-        mLinearLayoutManager = new LinearLayoutManager(this);
-        mTransactionsRecyclerView.setLayoutManager(mLinearLayoutManager);
-
-        mNoSmsTextView = (TextView) findViewById(R.id.no_sms_text_view);
-
-        // Create the list of companies
-        mCompaniesMap = generateComapniesList();
-
-        // Parse the list of transactions from the device
-        parseTransactions();
+    public TransactionsListModel(Context context) {
+        this.mContext = context;
     }
 
-    private void parseTransactions() {
-        Cursor cursor = getContentResolver().query(Uri.parse("content://sms/inbox"), PROJECTION, SELECTION_CLAUSE, SELECTION_ARGS, SORT_ORDER);
+    @Override
+    public Map<String, Company> getCompaniesMap() {
+        if (mCompaniesMap == null) {
+            mCompaniesMap = generateCompaniesMap();
+        }
+
+        return mCompaniesMap;
+    }
+
+    @Override
+    public List<ITransactions> getTransactionsList() {
+        // TODO: Update the data on real time
+        if (mTransactionsList == null) {
+            mTransactionsList = parseTransactions();
+        }
+
+        return mTransactionsList;
+    }
+
+    @Override
+    public HashMap<Long, Float> getTransactionsPerMonth() {
+        return mTransactionsPerMonth;
+    }
+
+    private List<ITransactions> parseTransactions() {
+        // TODO: Use RxJava here
+        List<ITransactions> transactionsList = new ArrayList<>();
+        Cursor cursor = mContext.getContentResolver().query(Uri.parse("content://sms/inbox"), PROJECTION, SELECTION_CLAUSE, SELECTION_ARGS, SORT_ORDER);
         if (cursor.moveToFirst()) {
-            mTransactionsList = new ArrayList<ITransactions>(cursor.getCount());
             do {
                 try {
                     Sms sms = new Sms();
@@ -121,12 +94,12 @@ public class MainActivity extends AppCompatActivity {
                             case EXPENSE_1:
                             case EXPENSE_2:
                                 Expense expense = new Expense(sms);
-                                mTransactionsList.add(expense);
+                                transactionsList.add(expense);
                                 break;
                             case WITHDRAW_1:
                             case WITHDRAW_2:
                                 Withdraw withdraw = new Withdraw(sms);
-                                mTransactionsList.add(withdraw);
+                                transactionsList.add(withdraw);
                                 break;
                             case UNKNOWN:
                                 Log.w(TAG, "Sms unknown " + sms.getBody());
@@ -135,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
                     } catch (IllegalArgumentException illegalArgumentException) {
                         Log.w(TAG, "transaction unknown " + illegalArgumentException.getMessage());
                     }
-                // To catch any error on Getting the data from the cursor
+                    // To catch any error on Getting the data from the cursor
                 } catch (IllegalArgumentException illegalArgumentException) {
                     Log.w(TAG, "Error getting sms message from content resolver ", illegalArgumentException);
                 }
@@ -143,39 +116,15 @@ public class MainActivity extends AppCompatActivity {
             cursor.close();
 
             // Update the transactions per month
-            for (ITransactions transactions : mTransactionsList) {
+            for (ITransactions transactions : transactionsList) {
                 updateTransactionsPerMonth(transactions);
             }
 
-            mTransactionsRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener(){
-                @Override
-                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                    super.onScrolled(recyclerView, dx, dy);
-                    int firstElementPosition = mLinearLayoutManager.findFirstVisibleItemPosition();
-                    ITransactions firstTransaction = mTransactionsList.get(firstElementPosition);
-
-                    // Update the header if needed
-                    long currentMonthlyKey = HeaderUtility.getHeaderMonthlyKeyByTransaction(firstTransaction);
-                    if (currentMonthlyKey != mFirstElementMonthlyKey) {
-                        // Update the month
-                        mHeaderDateTextView.setText(sHeaderDateFormatter.format(firstTransaction.getDate()));
-
-                        // Update the quantity
-                        mFirstElementMonthlyKey = currentMonthlyKey;
-                        mHeaderQuantityTextView.setText(String.format("%.02f", mTransactionsPerMonth.get(mFirstElementMonthlyKey))
-                                    + " " + getResources().getString(R.string.currency_aed));
-                    }
-                }
-            });
-            mTransactionsListAdapter = new TransactionsListAdapter(mContext, mTransactionsList, mCompaniesMap, mTransactionsPerMonth);
-            mTransactionsRecyclerView.setAdapter(mTransactionsListAdapter);
-
-            // Disable the no sms view
-            mNoSmsTextView.setVisibility(View.GONE);
         } else {
             Log.v(TAG, "The user does not have any sms");
-
         }
+
+        return transactionsList;
     }
 
     private void updateTransactionsPerMonth(ITransactions transaction) {
@@ -196,42 +145,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuItem showMonthlyGraphMenuItem = menu.add(Menu.NONE, MENU_ITEM_SHOW_MONTHLY_GRAPH_ID, Menu
-            .NONE, R.string.action_bar_show_monthly_graph)
-            .setIcon(R.drawable.ic_action_show_monthly_graph);
-        showMonthlyGraphMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case MENU_ITEM_SHOW_MONTHLY_GRAPH_ID:
-                showMonthlyGraphs();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private void showMonthlyGraphs() {
-        // If the data is not ready, don't do anything
-        if (mTransactionsPerMonth == null || mTransactionsPerMonth.isEmpty()) {
-            Log.w(TAG, "Trying to check the monthly transactions when the data is not ready");
-            return;
-        }
-
-        Intent startMonthlyExpensesActivityIntent = new Intent(mContext, MonthlyTransactionsActivity.class);
-        startMonthlyExpensesActivityIntent.putExtra(MonthlyTransactionsActivity.INTENT_KEY_MONTHLY_TRANSACTIONS,
-            mTransactionsPerMonth);
-        startActivity(startMonthlyExpensesActivityIntent);
-        return;
-    }
-
-    // TODO: Use database instead
-    private Map<String, Company> generateComapniesList() {
+    // TODO: Use database instead -> Realm
+    private Map<String, Company> generateCompaniesMap() {
         Map<String, Company> companiesMap = new HashMap<>();
 
         // Carrefour Mall of Emirates
