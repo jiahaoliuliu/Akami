@@ -1,4 +1,4 @@
-package com.jiahaoliuliu.akami.expenseslist;
+package com.jiahaoliuliu.akami.transactionslist;
 
 import com.jiahaoliuliu.akami.model.Company;
 import com.jiahaoliuliu.akami.modelviewpresenter.BasePresenter;
@@ -10,7 +10,7 @@ import java.util.Map;
  * Created by jiahaoliuliu on 7/7/17.
  */
 
-public interface ExpensesListContract {
+public interface TransactionsListContract {
 
     interface View extends BaseView {
 
