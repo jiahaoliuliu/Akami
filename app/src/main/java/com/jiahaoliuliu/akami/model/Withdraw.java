@@ -81,9 +81,10 @@ public class Withdraw implements ITransactions {
 
         // Quantity
         try {
-            this.quantity = Float.parseFloat(currencyAndQuantity.substring(3));
+            this.quantity = Float.parseFloat(currencyAndQuantity.substring(4));
         } catch (NumberFormatException numberFormatException) {
-            throw new IllegalArgumentException("Error parsing the quantity " + currencyAndQuantity.substring(3));
+            throw new IllegalArgumentException("Error parsing the quantity " + currencyAndQuantity.substring(3) +  "Full: \"" + currencyAndQuantity +"\"" +
+                    "SMS: \"" + sms.getBody() + "\"");
         }
 
         // Account
@@ -120,9 +121,10 @@ public class Withdraw implements ITransactions {
 
         // Quantity
         try {
-            this.quantity = Float.parseFloat(currencyAndQuantity.substring(3));
+            this.quantity = Float.parseFloat(currencyAndQuantity.substring(4));
         } catch (NumberFormatException numberFormatException) {
-            throw new IllegalArgumentException("Error parsing the quantity " + currencyAndQuantity.substring(3));
+            throw new IllegalArgumentException("Error parsing the quantity " + currencyAndQuantity.substring(3) +  "Full: \"" + currencyAndQuantity +"\"" +
+                "SMS: \"" + sms.getBody() + "\"");
         }
 
         // Account
@@ -159,6 +161,11 @@ public class Withdraw implements ITransactions {
     @Override
     public float getQuantity() {
         return quantity * currency.getExchangeRate();
+    }
+
+    @Override
+    public float getOriginalCurrencyQuantity() {
+        return quantity;
     }
 
     @Override

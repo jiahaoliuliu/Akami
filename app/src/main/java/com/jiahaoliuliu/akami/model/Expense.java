@@ -68,7 +68,8 @@ public class Expense implements ITransactions {
         try {
             this.quantity = Float.parseFloat(currencyAndQuantity.substring(3));
         } catch (NumberFormatException numberFormatException) {
-            throw new IllegalArgumentException("Error parsing the quantity " + currencyAndQuantity.substring(3));
+            throw new IllegalArgumentException("Error parsing the quantity " + currencyAndQuantity.substring(3) +  "Full: \"" + currencyAndQuantity +"\"" +
+                    "SMS: \"" + sms.getBody() + "\"");
         }
 
         this.creditCard = matcher.group(2);
@@ -99,6 +100,11 @@ public class Expense implements ITransactions {
     @Override
     public float getQuantity() {
         return quantity * currency.getExchangeRate();
+    }
+
+    @Override
+    public float getOriginalCurrencyQuantity() {
+        return quantity;
     }
 
     @Override
