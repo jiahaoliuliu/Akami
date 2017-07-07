@@ -1,7 +1,5 @@
 package com.jiahaoliuliu.akami.transactionslist;
 
-import android.content.Context;
-
 import com.jiahaoliuliu.akami.model.Company;
 import com.jiahaoliuliu.akami.model.ITransactions;
 import com.jiahaoliuliu.akami.modelviewpresenter.BasePresenter;

@@ -53,14 +53,12 @@ public class MainActivity extends BaseActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // Set the base presenter for the base view and for this view
-        // This should be done before the method onCreated because
-        // it is linked on the lifecycle of the application
-        mPresenter = (TransactionsListPresenter) getPresenter();
-        setPresenter(mPresenter);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mPresenter = (TransactionsListPresenter) getPresenter();
+        setPresenter(mPresenter);
 
         linkViews();
 
