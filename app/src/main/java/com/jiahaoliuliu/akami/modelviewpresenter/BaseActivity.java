@@ -18,7 +18,6 @@ public class BaseActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.mContext = this;
-        mBasePresenter.onViewCreated();
     }
 
     @Override

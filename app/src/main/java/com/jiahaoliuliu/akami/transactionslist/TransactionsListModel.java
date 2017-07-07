@@ -11,6 +11,7 @@ import com.jiahaoliuliu.akami.model.Expense;
 import com.jiahaoliuliu.akami.model.ITransactions;
 import com.jiahaoliuliu.akami.model.Sms;
 import com.jiahaoliuliu.akami.model.Withdraw;
+import com.jiahaoliuliu.akami.utils.HeaderUtility;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,6 +23,8 @@ import java.util.Map;
  */
 
 public class TransactionsListModel implements TransactionsListContract.Model {
+
+    private static final String TAG = "TransactionsListModel";
 
     // Projection. The fields of the sms to be returned
     private static final String[] PROJECTION = {
@@ -44,6 +47,7 @@ public class TransactionsListModel implements TransactionsListContract.Model {
     // Internal variables
     private Map<String, Company> mCompaniesMap;
     private List<ITransactions> mTransactionsList;
+    private HashMap<Long, Float> mTransactionsPerMonth;
     private Context mContext;
 
     public TransactionsListModel(Context context) {
@@ -69,10 +73,15 @@ public class TransactionsListModel implements TransactionsListContract.Model {
         return mTransactionsList;
     }
 
+    @Override
+    public HashMap<Long, Float> getTransactionsPerMonth() {
+        return mTransactionsPerMonth;
+    }
+
     private List<ITransactions> parseTransactions() {
+        List<ITransactions> transactionsList = new ArrayList<>();
         Cursor cursor = mContext.getContentResolver().query(Uri.parse("content://sms/inbox"), PROJECTION, SELECTION_CLAUSE, SELECTION_ARGS, SORT_ORDER);
         if (cursor.moveToFirst()) {
-            mTransactionsList = new ArrayList<ITransactions>(cursor.getCount());
             do {
                 try {
                     Sms sms = new Sms();
@@ -85,12 +94,12 @@ public class TransactionsListModel implements TransactionsListContract.Model {
                             case EXPENSE_1:
                             case EXPENSE_2:
                                 Expense expense = new Expense(sms);
-                                mTransactionsList.add(expense);
+                                transactionsList.add(expense);
                                 break;
                             case WITHDRAW_1:
                             case WITHDRAW_2:
                                 Withdraw withdraw = new Withdraw(sms);
-                                mTransactionsList.add(withdraw);
+                                transactionsList.add(withdraw);
                                 break;
                             case UNKNOWN:
                                 Log.w(TAG, "Sms unknown " + sms.getBody());
@@ -107,12 +116,32 @@ public class TransactionsListModel implements TransactionsListContract.Model {
             cursor.close();
 
             // Update the transactions per month
-            for (ITransactions transactions : mTransactionsList) {
+            for (ITransactions transactions : transactionsList) {
                 updateTransactionsPerMonth(transactions);
             }
+
         } else {
             Log.v(TAG, "The user does not have any sms");
+        }
 
+        return transactionsList;
+    }
+
+    private void updateTransactionsPerMonth(ITransactions transaction) {
+        // Intialize expense per month if needed
+        if (mTransactionsPerMonth == null) {
+            mTransactionsPerMonth = new HashMap<>();
+        }
+
+        long key = HeaderUtility.getHeaderMonthlyKeyByTransaction(transaction);
+
+        if (!mTransactionsPerMonth.containsKey(key)) {
+            mTransactionsPerMonth.put(key, 0.00f);
+            transaction.setFirstTransactionOfTheMonth(true);
+        } else {
+            float monthExpense = mTransactionsPerMonth.get(key);
+            monthExpense += transaction.getQuantity();
+            mTransactionsPerMonth.put(key, monthExpense);
         }
     }
 
