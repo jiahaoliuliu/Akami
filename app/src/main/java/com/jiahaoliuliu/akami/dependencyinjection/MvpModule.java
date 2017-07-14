@@ -1,7 +1,5 @@
 package com.jiahaoliuliu.akami.dependencyinjection;
 
-import android.content.Context;
-
 import com.jiahaoliuliu.akami.transactionslist.TransactionsListContract;
 import com.jiahaoliuliu.akami.transactionslist.TransactionsListPresenter;
 
@@ -15,17 +13,11 @@ import dagger.Provides;
  */
 
 @Module
-public class AppModule {
-
-    private Context mContext;
-
-    public AppModule(Context context) {
-        this.mContext = context;
-    }
+public class MvpModule {
 
     @Singleton
     @Provides
-    TransactionsListContract.Presenter provideRetrofitTransactionsListContractPresenter() {
+    TransactionsListContract.Presenter provideTransactionsListContractPresenter() {
         return new TransactionsListPresenter();
     }
 }

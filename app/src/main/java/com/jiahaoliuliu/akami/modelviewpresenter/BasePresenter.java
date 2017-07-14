@@ -10,6 +10,12 @@ import android.content.Context;
 public interface BasePresenter {
 
     /**
+     * Set the base view
+     * @param view
+     */
+    void setView(BaseView view);
+
+    /**
      * Linked with the lifecycle of the view. This is called
      * on onCreate from the view
      * @param context The context of the application

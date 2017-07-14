@@ -2,6 +2,8 @@ package com.jiahaoliuliu.akami.transactionslist;
 
 import android.content.Context;
 
+import com.jiahaoliuliu.akami.modelviewpresenter.BaseView;
+
 /**
  * Created by jiahaoliuliu on 7/7/17.
  */
@@ -24,8 +26,8 @@ public class TransactionsListPresenter implements TransactionsListContract.Prese
      * This method has been separated from the contructor for better testability
      * @param view
      */
-    public void setView(TransactionsListContract.View view) {
-        this.mView = view;
+    public void setView(BaseView view) {
+        this.mView = (TransactionsListContract.View)view;
     }
 
     @Override
