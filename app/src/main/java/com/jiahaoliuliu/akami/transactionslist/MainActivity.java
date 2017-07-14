@@ -58,6 +58,8 @@ public class MainActivity extends BaseActivity
         ((MainApplication) getApplication()).getAppComponent().inject(this);
 
         mPresenter.setView(this);
+
+        // To be used in the base activity
         setPresenter(mPresenter);
 
         linkViews();
