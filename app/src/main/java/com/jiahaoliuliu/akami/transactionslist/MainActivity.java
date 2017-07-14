@@ -8,17 +8,14 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.jiahaoliuliu.akami.MainApplication;
 import com.jiahaoliuliu.akami.R;
 import com.jiahaoliuliu.akami.model.Company;
 import com.jiahaoliuliu.akami.model.ITransactions;
 import com.jiahaoliuliu.akami.modelviewpresenter.BaseActivity;
-import com.jiahaoliuliu.akami.modelviewpresenter.BasePresenter;
-import com.jiahaoliuliu.akami.modelviewpresenter.BaseView;
 import com.jiahaoliuliu.akami.ui.MonthlyTransactionsActivity;
-import com.jiahaoliuliu.akami.ui.TransactionsListAdapter;
 import com.jiahaoliuliu.akami.utils.HeaderUtility;
 
 import java.text.SimpleDateFormat;
@@ -26,8 +23,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 public class MainActivity extends BaseActivity
-        implements TransactionsListContract.View, BaseView {
+        implements TransactionsListContract.View {
 
     private static final String TAG = "MainActivity";
     private static final int MENU_ITEM_SHOW_MONTHLY_GRAPH_ID = 1000;
@@ -49,14 +48,18 @@ public class MainActivity extends BaseActivity
     // The month of the first element shown in the header
     private long mFirstElementMonthlyKey;
 
-    private TransactionsListPresenter mPresenter;
+    @Inject
+    TransactionsListContract.Presenter mPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ((MainApplication) getApplication()).getAppComponent().inject(this);
 
-        mPresenter = (TransactionsListPresenter) getPresenter();
+        mPresenter.setView(this);
+
+        // To be used in the base activity
         setPresenter(mPresenter);
 
         linkViews();
@@ -149,11 +152,5 @@ public class MainActivity extends BaseActivity
                 transactionsPerMonth);
         startActivity(startMonthlyExpensesActivityIntent);
         return;
-    }
-
-    // TODO: Use Dagger instead
-    @Override
-    public BasePresenter getPresenter() {
-        return new TransactionsListPresenter(this);
     }
 }

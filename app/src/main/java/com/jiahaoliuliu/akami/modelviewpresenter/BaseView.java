@@ -7,13 +7,5 @@ import android.support.v7.app.AppCompatActivity;
 /**
  * Created by jiahaoliuliu on 7/7/17.
  */
-
 public interface BaseView {
-
-    /**
-     * Get the base presenter for the view
-     * @return
-     *
-     */
-    BasePresenter getPresenter();
 }

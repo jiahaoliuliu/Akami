@@ -1,4 +1,4 @@
-package com.jiahaoliuliu.akami.ui;
+package com.jiahaoliuliu.akami.transactionslist;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -12,7 +12,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.jiahaoliuliu.akami.R;
-import com.jiahaoliuliu.akami.transactionslist.MainActivity;
 import com.jiahaoliuliu.akami.model.Company;
 import com.jiahaoliuliu.akami.model.ITransactions;
 import com.jiahaoliuliu.akami.model.Withdraw;

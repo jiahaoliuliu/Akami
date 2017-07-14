@@ -128,7 +128,7 @@ public class TransactionsListModel implements TransactionsListContract.Model {
     }
 
     private void updateTransactionsPerMonth(ITransactions transaction) {
-        // Intialize expense per month if needed
+        // Initialize expense per month if needed
         if (mTransactionsPerMonth == null) {
             mTransactionsPerMonth = new HashMap<>();
         }

@@ -177,9 +177,7 @@ public class MonthlyTransactionsActivity extends AppCompatActivity {
 
             mMonthlyTransactionsBarChart.setData(data);
         }
-
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

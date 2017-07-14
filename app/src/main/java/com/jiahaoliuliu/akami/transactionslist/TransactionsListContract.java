@@ -2,6 +2,7 @@ package com.jiahaoliuliu.akami.transactionslist;
 
 import com.jiahaoliuliu.akami.model.Company;
 import com.jiahaoliuliu.akami.model.ITransactions;
+import com.jiahaoliuliu.akami.modelviewpresenter.BaseModel;
 import com.jiahaoliuliu.akami.modelviewpresenter.BasePresenter;
 import com.jiahaoliuliu.akami.modelviewpresenter.BaseView;
 
@@ -47,7 +48,7 @@ public interface TransactionsListContract {
         void onShowMonthlyGraphRequested();
     }
 
-    interface Model {
+    interface Model extends BaseModel {
 
         /**
          * Get the list of companies
