@@ -2,8 +2,8 @@ package com.jiahaoliuliu.akami;
 
 import android.app.Application;
 
-import com.jiahaoliuliu.akami.dependencyinjection.AppComponent;
-import com.jiahaoliuliu.akami.dependencyinjection.DaggerAppComponent;
+import com.jiahaoliuliu.akami.di.AppComponent;
+import com.jiahaoliuliu.akami.di.DaggerAppComponent;
 
 /**
  * Created by jiahaoliuliu on 7/7/17.

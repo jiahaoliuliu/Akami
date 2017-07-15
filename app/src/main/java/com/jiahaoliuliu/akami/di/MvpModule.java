@@ -1,4 +1,4 @@
-package com.jiahaoliuliu.akami.dependencyinjection;
+package com.jiahaoliuliu.akami.di;
 
 import com.jiahaoliuliu.akami.transactionslist.TransactionsListContract;
 import com.jiahaoliuliu.akami.transactionslist.TransactionsListPresenter;
