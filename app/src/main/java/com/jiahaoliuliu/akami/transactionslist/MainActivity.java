@@ -1,5 +1,6 @@
 package com.jiahaoliuliu.akami.transactionslist;
 
+import android.app.Application;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.jiahaoliuliu.akami.BaseApplication;
 import com.jiahaoliuliu.akami.MainApplication;
 import com.jiahaoliuliu.akami.R;
 import com.jiahaoliuliu.akami.model.Company;
@@ -55,7 +57,7 @@ public class MainActivity extends BaseActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ((MainApplication) getApplication()).getAppComponent().inject(this);
+        BaseApplication.getInstance().getComponent().inject(this);
 
         mPresenter.setView(this);
 

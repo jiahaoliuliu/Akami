@@ -9,7 +9,7 @@ import com.jiahaoliuliu.akami.di.DaggerAppComponent;
  * Created by jiahaoliuliu on 7/7/17.
  */
 
-public class MainApplication extends Application {
+public class MainApplication extends BaseApplication {
 
     private AppComponent mAppComponent;
 
@@ -22,7 +22,8 @@ public class MainApplication extends Application {
                 .build();
     }
 
-    public AppComponent getAppComponent() {
+    @Override
+    public AppComponent getComponent() {
         return mAppComponent;
     }
 }
