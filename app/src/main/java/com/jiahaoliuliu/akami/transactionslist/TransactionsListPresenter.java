@@ -7,6 +7,7 @@ import android.util.Log;
 import com.jiahaoliuliu.akami.model.ITransactions;
 import com.jiahaoliuliu.akami.modelviewpresenter.BaseView;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -49,38 +50,29 @@ public class TransactionsListPresenter implements TransactionsListContract.Prese
         this.mView = (TransactionsListContract.View)view;
     }
 
+    @SuppressLint("LongLogTag")
     @Override
     public void onViewCreated() {
         compositeDisposable = new CompositeDisposable();
 
         compositeDisposable.add(Observable
-                .fromCallable(() -> mModel.getTransactionsList())
+                .just(mModel.getTransactionsList())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableObserver<List<ITransactions>>() {
-                    @SuppressLint("LongLogTag")
-                    @Override
-                    public void onNext(List<ITransactions> transactionsList) {
-                        Log.v(TAG, "List of transactions get " + transactionsList.size());
-                        HashMap<Long, Float> transactionsPerMonth = mModel.getTransactionsPerMonth();
-
-                        // Show the List of transactions
-                        mView.showTransactionsList(transactionsList,
-                                transactionsPerMonth, mModel.getCompaniesMap());
-                        mView.setupHeader(transactionsList, transactionsPerMonth);
+                .doOnSubscribe(__ -> mView.showLoadingScreen())
+                .subscribe(transactionsList -> {
+                    Log.v(TAG, "List of transactions get " + transactionsList.size());
+                    if (transactionsList.isEmpty()) {
+                        mView.showNoSmsScreen();
+                        return;
                     }
+                    HashMap<Long, Float> transactionsPerMonth = mModel.getTransactionsPerMonth();
 
-                    @SuppressLint("LongLogTag")
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e(TAG, "Error getting the list of transactions ", e);
-                    }
-
-                    @SuppressLint("LongLogTag")
-                    @Override
-                    public void onComplete() {
-                        Log.e(TAG, "Operation completed");
-                    }
+                    // FIXME: For some reason, the list need to be set before the header is set.
+                    // Show the List of transactions
+                    mView.showTransactionsList(transactionsList,
+                            transactionsPerMonth, mModel.getCompaniesMap());
+                    mView.setupHeader(transactionsList, transactionsPerMonth);
                 }));
     }
 
