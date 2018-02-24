@@ -14,6 +14,7 @@ import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
@@ -33,6 +34,8 @@ public class TransactionsListPresenter implements TransactionsListContract.Prese
      */
     private TransactionsListContract.Model mModel;
 
+    private CompositeDisposable compositeDisposable;
+
     public TransactionsListPresenter() {
         super();
         mModel = new TransactionsListModel();
@@ -48,8 +51,9 @@ public class TransactionsListPresenter implements TransactionsListContract.Prese
 
     @Override
     public void onViewCreated() {
+        compositeDisposable = new CompositeDisposable();
 
-        Disposable transactionsListDisposable = Observable
+        compositeDisposable.add(Observable
                 .fromCallable(() -> mModel.getTransactionsList())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -77,8 +81,7 @@ public class TransactionsListPresenter implements TransactionsListContract.Prese
                     public void onComplete() {
                         Log.e(TAG, "Operation completed");
                     }
-                });
-
+                }));
     }
 
     @Override
@@ -93,7 +96,7 @@ public class TransactionsListPresenter implements TransactionsListContract.Prese
 
     @Override
     public void onViewDestroyed() {
-        // Nothing to do here
+        compositeDisposable.dispose();
     }
 
     @Override
