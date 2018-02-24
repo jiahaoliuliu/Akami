@@ -73,60 +73,75 @@ public class TransactionsListModel implements TransactionsListContract.Model {
     }
 
     private List<ITransactions> parseTransactions() {
-        // TODO: Use RxJava here
         List<ITransactions> transactionsList = new ArrayList<>();
         Cursor cursor = MainApplication.getApplication().getContentResolver()
                 .query(Uri.parse("content://sms/inbox"), PROJECTION, SELECTION_CLAUSE, SELECTION_ARGS, SORT_ORDER);
 
-            transactionsList.addAll(getDataFromCursor(cursor));
-            // Update the transactions per month
-            for (ITransactions transactions : transactionsList) {
-                updateTransactionsPerMonth(transactions);
-            }
+        transactionsList.addAll(getDataFromCursor(cursor));
+        // Update the transactions per month
+        for (ITransactions transactions : transactionsList) {
+            updateTransactionsPerMonth(transactions);
+        }
 
         return transactionsList;
     }
 
     private List<ITransactions> getDataFromCursor(Cursor cursor) {
         List<ITransactions> transactionsList = new ArrayList<>();
-        if (cursor.moveToFirst()) {
-            do {
-                try {
-                    Sms sms = new Sms();
-                    //                sms.set_id(cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_ID)));
-                    sms.setDate((cursor.getLong(cursor.getColumnIndexOrThrow(Sms.COLUMN_DATE))));
-                    sms.setBody((cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_BODY))));
-    //                    Log.v(TAG, "SMS " + sms);
-                    try {
-                        switch (sms.getType()) {
-                            case EXPENSE_1:
-                            case EXPENSE_2:
-                                Expense expense = new Expense(sms);
-                                transactionsList.add(expense);
-                                break;
-                            case WITHDRAW_1:
-                            case WITHDRAW_2:
-                                Withdraw withdraw = new Withdraw(sms);
-                                transactionsList.add(withdraw);
-                                break;
-                            case UNKNOWN:
-                                Log.w(TAG, "Sms unknown " + sms.getBody());
-                                break;
-                        }
-                    } catch (IllegalArgumentException illegalArgumentException) {
-                        Log.w(TAG, "transaction unknown " + illegalArgumentException.getMessage());
-                    }
-                    // To catch any error on Getting the data from the cursor
-                } catch (IllegalArgumentException illegalArgumentException) {
-                    Log.w(TAG, "Error getting sms message from content resolver ", illegalArgumentException);
-                }
-            } while (cursor.moveToNext());
-            cursor.close();
-        } else {
+
+        // Try to move the cursor to the first position
+        if (!cursor.moveToFirst()) {
             Log.v(TAG, "The user does not have any sms");
+            cursor.close();
+            return transactionsList;
         }
 
+        do {
+            try {
+                Sms sms = new Sms();
+                //                sms.set_id(cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_ID)));
+                sms.setDate((cursor.getLong(cursor.getColumnIndexOrThrow(Sms.COLUMN_DATE))));
+                sms.setBody((cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_BODY))));
+//                    Log.v(TAG, "SMS " + sms);
+
+                // If the parsed transaction is valid, return it
+                ITransactions transactions = parseSms(sms);
+                if (transactions != null) {
+                    transactionsList.add(transactions);
+                }
+
+                // To catch any error on Getting the data from the cursor
+            } catch (IllegalArgumentException illegalArgumentException) {
+                Log.w(TAG, "Error getting sms message from content resolver ", illegalArgumentException);
+            }
+        } while (cursor.moveToNext());
+        cursor.close();
+
         return transactionsList;
+    }
+
+    private ITransactions parseSms(Sms sms) {
+        ITransactions transactions = null;
+        try {
+            switch (sms.getType()) {
+                case EXPENSE_1:
+                case EXPENSE_2:
+                    transactions = new Expense(sms);
+                    break;
+                case WITHDRAW_1:
+                case WITHDRAW_2:
+                    transactions = new Withdraw(sms);
+                    break;
+                default:
+                case UNKNOWN:
+//                    Log.w(TAG, "Sms unknown " + sms.getBody());
+                    break;
+            }
+        } catch (IllegalArgumentException illegalArgumentException) {
+            Log.w(TAG, "transaction unknown " + illegalArgumentException.getMessage());
+        }
+
+        return transactions;
     }
 
     private void updateTransactionsPerMonth(ITransactions transaction) {
