@@ -23,7 +23,7 @@ public class TransactionsListPresenter implements TransactionsListContract.Prese
     }
 
     /**
-     * This method has been separated from the contructor for better testability
+     * This method has been separated from the constructor for better testability
      * @param view
      */
     public void setView(BaseView view) {
