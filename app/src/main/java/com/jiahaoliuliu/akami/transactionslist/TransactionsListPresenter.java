@@ -31,9 +31,8 @@ public class TransactionsListPresenter implements TransactionsListContract.Prese
     }
 
     @Override
-    public void onViewCreated(Context context) {
-        this.mContext = context;
-        mModel = new TransactionsListModel(mContext);
+    public void onViewCreated() {
+        mModel = new TransactionsListModel();
         // Show the List of transactions
         mView.showTransactionsList(mModel.getTransactionsList(),
                 mModel.getTransactionsPerMonth(), mModel.getCompaniesMap());
