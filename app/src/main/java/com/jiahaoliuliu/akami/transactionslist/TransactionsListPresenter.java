@@ -1,8 +1,24 @@
 package com.jiahaoliuliu.akami.transactionslist;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.util.Log;
 
+import com.jiahaoliuliu.akami.model.ITransactions;
 import com.jiahaoliuliu.akami.modelviewpresenter.BaseView;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by jiahaoliuliu on 7/7/17.
@@ -10,7 +26,8 @@ import com.jiahaoliuliu.akami.modelviewpresenter.BaseView;
 
 public class TransactionsListPresenter implements TransactionsListContract.Presenter {
 
-    private Context mContext;
+    private static final String TAG = "TransactionsListPresenter";
+
     private TransactionsListContract.View mView;
 
     /**
@@ -18,8 +35,11 @@ public class TransactionsListPresenter implements TransactionsListContract.Prese
      */
     private TransactionsListContract.Model mModel;
 
+    private CompositeDisposable compositeDisposable;
+
     public TransactionsListPresenter() {
         super();
+        mModel = new TransactionsListModel();
     }
 
     /**
@@ -30,14 +50,30 @@ public class TransactionsListPresenter implements TransactionsListContract.Prese
         this.mView = (TransactionsListContract.View)view;
     }
 
+    @SuppressLint("LongLogTag")
     @Override
-    public void onViewCreated(Context context) {
-        this.mContext = context;
-        mModel = new TransactionsListModel(mContext);
-        // Show the List of transactions
-        mView.showTransactionsList(mModel.getTransactionsList(),
-                mModel.getTransactionsPerMonth(), mModel.getCompaniesMap());
-        mView.setupHeader(mModel.getTransactionsList(), mModel.getTransactionsPerMonth());
+    public void onViewCreated() {
+        compositeDisposable = new CompositeDisposable();
+
+        compositeDisposable.add(Observable
+                .just(mModel.getTransactionsList())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(__ -> mView.showLoadingScreen())
+                .subscribe(transactionsList -> {
+                    Log.v(TAG, "List of transactions get " + transactionsList.size());
+                    if (transactionsList.isEmpty()) {
+                        mView.showNoSmsScreen();
+                        return;
+                    }
+                    HashMap<Long, Float> transactionsPerMonth = mModel.getTransactionsPerMonth();
+
+                    // FIXME: For some reason, the list need to be set before the header is set.
+                    // Show the List of transactions
+                    mView.showTransactionsList(transactionsList,
+                            transactionsPerMonth, mModel.getCompaniesMap());
+                    mView.setupHeader(transactionsList, transactionsPerMonth);
+                }));
     }
 
     @Override
@@ -52,7 +88,7 @@ public class TransactionsListPresenter implements TransactionsListContract.Prese
 
     @Override
     public void onViewDestroyed() {
-        // Nothing to do here
+        compositeDisposable.dispose();
     }
 
     @Override

@@ -38,6 +38,18 @@ public interface TransactionsListContract {
 
         void setupHeader(List<ITransactions> transactionsList,
                          HashMap<Long, Float> transactionsPerMonth);
+
+        /**
+         * Show a loading screen
+         */
+        void showLoadingScreen();
+
+        /**
+         * Show this screen simulating there is not SMS
+         * For now this is used to show error message
+         * TODO: ADD error screen
+         */
+        void showNoSmsScreen();
     }
 
     interface Presenter extends BasePresenter {
@@ -57,7 +69,8 @@ public interface TransactionsListContract {
         Map<String, Company> getCompaniesMap();
 
         /**
-         * Get the list of transactions from the SMS
+         * Get the list of transactions from the SMS. This operation is highly costly. It
+         * need to be run on other thread than main thread
          *
          * @return
          *      The list of the transactions that the user has

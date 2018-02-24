@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.jiahaoliuliu.akami.MainApplication;
@@ -39,6 +40,7 @@ public class MainActivity extends BaseActivity
     private TextView mHeaderQuantityTextView;
     private RecyclerView mTransactionsRecyclerView;
     private TextView mNoSmsTextView;
+    private LinearLayout mProgressLayout;
 
     private TransactionsListAdapter mTransactionsListAdapter;
     private LinearLayoutManager mLinearLayoutManager;
@@ -64,7 +66,7 @@ public class MainActivity extends BaseActivity
 
         linkViews();
 
-        mPresenter.onViewCreated(mContext);
+        mPresenter.onViewCreated();
     }
 
     private void linkViews() {
@@ -77,12 +79,14 @@ public class MainActivity extends BaseActivity
         mTransactionsRecyclerView.setLayoutManager(mLinearLayoutManager);
 
         mNoSmsTextView = (TextView) findViewById(R.id.no_sms_text_view);
+
+        mProgressLayout = (LinearLayout) findViewById(R.id.progress_layout);
     }
 
     @Override
     public void setupHeader(final List<ITransactions> transactionsList,
                               final HashMap<Long, Float> transactionsPerMonth) {
-        // Set the logic for the recycler view
+       // Set the logic for the recycler view
         mTransactionsRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener(){
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -107,6 +111,20 @@ public class MainActivity extends BaseActivity
     }
 
     @Override
+    public void showLoadingScreen() {
+        mTransactionsRecyclerView.setVisibility(View.GONE);
+        mNoSmsTextView.setVisibility(View.GONE);
+        mProgressLayout.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void showNoSmsScreen() {
+        mTransactionsRecyclerView.setVisibility(View.GONE);
+        mNoSmsTextView.setVisibility(View.VISIBLE);
+        mProgressLayout.setVisibility(View.GONE);
+    }
+
+    @Override
     public void showTransactionsList(List<ITransactions> transactionsList,
                                      HashMap<Long, Float> transactionsPerMonth,
                                      Map<String, Company> companiesMap) {
@@ -114,9 +132,11 @@ public class MainActivity extends BaseActivity
                 transactionsList, companiesMap,
                 transactionsPerMonth);
         mTransactionsRecyclerView.setAdapter(mTransactionsListAdapter);
+        mTransactionsRecyclerView.setVisibility(View.VISIBLE);
 
         // Disable the no sms view
         mNoSmsTextView.setVisibility(View.GONE);
+        mProgressLayout.setVisibility(View.GONE);
     }
 
     @Override

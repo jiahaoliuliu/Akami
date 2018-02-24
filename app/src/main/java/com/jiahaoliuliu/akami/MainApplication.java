@@ -1,6 +1,7 @@
 package com.jiahaoliuliu.akami;
 
 import android.app.Application;
+import android.content.Context;
 
 import com.jiahaoliuliu.akami.dependencyinjection.AppComponent;
 import com.jiahaoliuliu.akami.dependencyinjection.DaggerAppComponent;
@@ -11,11 +12,14 @@ import com.jiahaoliuliu.akami.dependencyinjection.DaggerAppComponent;
 
 public class MainApplication extends Application {
 
+    private static Context application;
     private AppComponent mAppComponent;
 
     @Override
     public void onCreate() {
         super.onCreate();
+
+        application = this;
 
         mAppComponent = DaggerAppComponent
                 .builder()
@@ -24,5 +28,9 @@ public class MainApplication extends Application {
 
     public AppComponent getAppComponent() {
         return mAppComponent;
+    }
+
+    public static Context getApplication() {
+        return application;
     }
 }
