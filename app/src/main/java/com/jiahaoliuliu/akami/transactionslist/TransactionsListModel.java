@@ -1,6 +1,5 @@
 package com.jiahaoliuliu.akami.transactionslist;
 
-import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
@@ -78,6 +77,18 @@ public class TransactionsListModel implements TransactionsListContract.Model {
         List<ITransactions> transactionsList = new ArrayList<>();
         Cursor cursor = MainApplication.getApplication().getContentResolver()
                 .query(Uri.parse("content://sms/inbox"), PROJECTION, SELECTION_CLAUSE, SELECTION_ARGS, SORT_ORDER);
+
+            transactionsList.addAll(getDataFromCursor(cursor));
+            // Update the transactions per month
+            for (ITransactions transactions : transactionsList) {
+                updateTransactionsPerMonth(transactions);
+            }
+
+        return transactionsList;
+    }
+
+    private List<ITransactions> getDataFromCursor(Cursor cursor) {
+        List<ITransactions> transactionsList = new ArrayList<>();
         if (cursor.moveToFirst()) {
             do {
                 try {
@@ -85,7 +96,7 @@ public class TransactionsListModel implements TransactionsListContract.Model {
                     //                sms.set_id(cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_ID)));
                     sms.setDate((cursor.getLong(cursor.getColumnIndexOrThrow(Sms.COLUMN_DATE))));
                     sms.setBody((cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_BODY))));
-//                    Log.v(TAG, "SMS " + sms);
+    //                    Log.v(TAG, "SMS " + sms);
                     try {
                         switch (sms.getType()) {
                             case EXPENSE_1:
@@ -111,12 +122,6 @@ public class TransactionsListModel implements TransactionsListContract.Model {
                 }
             } while (cursor.moveToNext());
             cursor.close();
-
-            // Update the transactions per month
-            for (ITransactions transactions : transactionsList) {
-                updateTransactionsPerMonth(transactions);
-            }
-
         } else {
             Log.v(TAG, "The user does not have any sms");
         }
