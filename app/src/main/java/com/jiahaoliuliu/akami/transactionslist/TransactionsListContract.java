@@ -38,6 +38,18 @@ public interface TransactionsListContract {
 
         void setupHeader(List<ITransactions> transactionsList,
                          HashMap<Long, Float> transactionsPerMonth);
+
+        /**
+         * Show a loading screen
+         */
+        void showLoadingScreen();
+
+        /**
+         * Show this screen simulating there is not SMS
+         * For now this is used to show error message
+         * TODO: ADD error screen
+         */
+        void showNoSmsScreen();
     }
 
     interface Presenter extends BasePresenter {
