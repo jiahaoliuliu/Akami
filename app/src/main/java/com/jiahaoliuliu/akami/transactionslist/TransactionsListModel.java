@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
 
+import com.jiahaoliuliu.akami.MainApplication;
 import com.jiahaoliuliu.akami.R;
 import com.jiahaoliuliu.akami.model.Company;
 import com.jiahaoliuliu.akami.model.Expense;
@@ -47,11 +48,6 @@ public class TransactionsListModel implements TransactionsListContract.Model {
     private Map<String, Company> mCompaniesMap;
     private List<ITransactions> mTransactionsList;
     private HashMap<Long, Float> mTransactionsPerMonth;
-    private Context mContext;
-
-    public TransactionsListModel(Context context) {
-        this.mContext = context;
-    }
 
     @Override
     public Map<String, Company> getCompaniesMap() {
@@ -80,7 +76,8 @@ public class TransactionsListModel implements TransactionsListContract.Model {
     private List<ITransactions> parseTransactions() {
         // TODO: Use RxJava here
         List<ITransactions> transactionsList = new ArrayList<>();
-        Cursor cursor = mContext.getContentResolver().query(Uri.parse("content://sms/inbox"), PROJECTION, SELECTION_CLAUSE, SELECTION_ARGS, SORT_ORDER);
+        Cursor cursor = MainApplication.getApplication().getContentResolver()
+                .query(Uri.parse("content://sms/inbox"), PROJECTION, SELECTION_CLAUSE, SELECTION_ARGS, SORT_ORDER);
         if (cursor.moveToFirst()) {
             do {
                 try {

@@ -64,7 +64,7 @@ public class MainActivity extends BaseActivity
 
         linkViews();
 
-        mPresenter.onViewCreated(mContext);
+        mPresenter.onViewCreated();
     }
 
     private void linkViews() {
