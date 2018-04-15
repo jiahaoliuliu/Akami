@@ -1,0 +1,3 @@
+package com.jiahaoliuliu.akami.modelviewpresenter
+
+interface BaseView
