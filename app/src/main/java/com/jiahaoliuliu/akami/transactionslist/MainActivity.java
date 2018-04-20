@@ -128,7 +128,7 @@ public class MainActivity extends BaseActivity
     public void showTransactionsList(List<ITransactions> transactionsList,
                                      HashMap<Long, Float> transactionsPerMonth,
                                      Map<String, Company> companiesMap) {
-        mTransactionsListAdapter = new TransactionsListAdapter(mContext,
+        mTransactionsListAdapter = new TransactionsListAdapter(context,
                 transactionsList, companiesMap,
                 transactionsPerMonth);
         mTransactionsRecyclerView.setAdapter(mTransactionsListAdapter);
