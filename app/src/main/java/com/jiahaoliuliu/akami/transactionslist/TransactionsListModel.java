@@ -14,6 +14,7 @@ import com.jiahaoliuliu.akami.model.Withdraw;
 import com.jiahaoliuliu.akami.utils.HeaderUtility;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -98,10 +99,8 @@ public class TransactionsListModel implements TransactionsListContract.Model {
 
         do {
             try {
-                Sms sms = new Sms();
-                //                sms.set_id(cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_ID)));
-                sms.setDate((cursor.getLong(cursor.getColumnIndexOrThrow(Sms.COLUMN_DATE))));
-                sms.setBody((cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_BODY))));
+                Sms sms = new Sms(cursor.getString(cursor.getColumnIndexOrThrow(Sms.COLUMN_BODY)),
+                        new Date(cursor.getLong(cursor.getColumnIndexOrThrow(Sms.COLUMN_DATE))));
 //                    Log.v(TAG, "SMS " + sms);
 
                 // If the parsed transaction is valid, return it

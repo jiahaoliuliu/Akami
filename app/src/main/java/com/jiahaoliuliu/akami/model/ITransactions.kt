@@ -8,11 +8,6 @@ import java.util.Date
 interface ITransactions {
 
     /**
-     * Get the id of the transaction
-     */
-    fun getId(): String
-
-    /**
      * Get the type of the transaction
      */
     fun getType(): TransactionsType

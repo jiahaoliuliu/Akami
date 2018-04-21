@@ -31,8 +31,6 @@ public class Withdraw implements ITransactions {
     private static final SimpleDateFormat DATE_FORMATTER_WITHDRAW_1 = new SimpleDateFormat(DATE_FORMAT_WITHDRAW_1);
     private static final SimpleDateFormat DATE_FORMATTER_WITHDRAW_2 = new SimpleDateFormat(DATE_FORMAT_WITHDRAW_2);
 
-    private String id;
-
     private Date date;
 
     private Currency currency;
@@ -69,9 +67,6 @@ public class Withdraw implements ITransactions {
         if (!matcher.find()) {
             throw new IllegalArgumentException("The type of the sms suppose to be expense 1 but it does not matches");
         }
-
-        // Id
-        this.id = sms.getId();
 
         // Currency
         String currencyAndQuantity = matcher.group(1);
@@ -111,7 +106,6 @@ public class Withdraw implements ITransactions {
         }
 
         // Id
-        this.id = sms.getId();
 
         // Currency
         String currencyAndQuantity = matcher.group(1);
@@ -141,11 +135,6 @@ public class Withdraw implements ITransactions {
 
         // Branch
         this.branch = matcher.group(4);
-    }
-
-    @Override
-    public String getId() {
-        return id;
     }
 
     @Override
@@ -202,7 +191,6 @@ public class Withdraw implements ITransactions {
 
         if (Float.compare(withdraw.quantity, quantity) != 0) return false;
         if (isFirstTransactionOfTheMonth != withdraw.isFirstTransactionOfTheMonth) return false;
-        if (id != null ? !id.equals(withdraw.id) : withdraw.id != null) return false;
         if (date != null ? !date.equals(withdraw.date) : withdraw.date != null) return false;
         if (currency != withdraw.currency) return false;
         if (account != null ? !account.equals(withdraw.account) : withdraw.account != null)
@@ -211,28 +199,4 @@ public class Withdraw implements ITransactions {
 
     }
 
-    @Override
-    public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (date != null ? date.hashCode() : 0);
-        result = 31 * result + (currency != null ? currency.hashCode() : 0);
-        result = 31 * result + (quantity != +0.0f ? Float.floatToIntBits(quantity) : 0);
-        result = 31 * result + (account != null ? account.hashCode() : 0);
-        result = 31 * result + (branch != null ? branch.hashCode() : 0);
-        result = 31 * result + (isFirstTransactionOfTheMonth ? 1 : 0);
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        return "Withdraw{" +
-                "id='" + id + '\'' +
-                ", date=" + date +
-                ", currency=" + currency +
-                ", quantity=" + quantity +
-                ", account='" + account + '\'' +
-                ", branch='" + branch + '\'' +
-                ", isFirstTransactionOfTheMonth=" + isFirstTransactionOfTheMonth +
-                '}';
-    }
 }
