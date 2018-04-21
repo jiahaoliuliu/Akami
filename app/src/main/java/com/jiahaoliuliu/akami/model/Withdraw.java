@@ -2,6 +2,8 @@ package com.jiahaoliuliu.akami.model;
 
 import android.util.Log;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -173,11 +175,6 @@ public class Withdraw implements ITransactions {
     }
 
     @Override
-    public boolean isFirstTransactionOfTheMonth() {
-        return isFirstTransactionOfTheMonth;
-    }
-
-    @Override
     public void setFirstTransactionOfTheMonth(boolean firstTransactionOfTheMonth) {
         isFirstTransactionOfTheMonth = firstTransactionOfTheMonth;
     }
@@ -199,4 +196,43 @@ public class Withdraw implements ITransactions {
 
     }
 
+    @Override
+    public void setDate(@NotNull Date date) {
+        throw new IllegalArgumentException("This field shouldn't be set once initialized");
+    }
+
+    @Override
+    public void setType(@NotNull TransactionsType transactionsType) {
+        throw new IllegalArgumentException("This field shouldn't be set once initialized");
+    }
+
+    @Override
+    public void setCurrency(@NotNull Currency currency) {
+        throw new IllegalArgumentException("This field shouldn't be set once initialized");
+    }
+
+    @Override
+    public void setQuantity(float v) {
+        throw new IllegalArgumentException("This field shouldn't be set once initialized");
+    }
+
+    @Override
+    public void setOriginalCurrencyQuantity(float v) {
+        throw new IllegalArgumentException("This field shouldn't be set once initialized");
+    }
+
+    @Override
+    public void setSource(@NotNull String s) {
+        throw new IllegalArgumentException("This field shouldn't be set once initialized");
+    }
+
+    @Override
+    public void setDestination(@NotNull String s) {
+        throw new IllegalArgumentException("This field shouldn't be set once initialized");
+    }
+
+    @Override
+    public boolean getFirstTransactionOfTheMonth() {
+        return false;
+    }
 }
