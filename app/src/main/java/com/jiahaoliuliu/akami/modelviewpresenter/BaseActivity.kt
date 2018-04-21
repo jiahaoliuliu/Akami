@@ -7,12 +7,11 @@ import android.support.v7.app.AppCompatActivity
 open class BaseActivity : AppCompatActivity() {
 
     var basePresenter: BasePresenter? = null
-    var context: Context? = null
+    lateinit var context: Context
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         context = this
-        basePresenter?.onViewCreated()
     }
 
     override fun onResume() {

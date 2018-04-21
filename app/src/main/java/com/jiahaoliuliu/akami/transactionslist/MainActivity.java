@@ -58,15 +58,13 @@ public class MainActivity extends BaseActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ((MainApplication) getApplication()).getAppComponent().inject(this);
-
         mPresenter.setView(this);
 
         // To be used in the base activity
-        setPresenter(mPresenter);
-
+        setBasePresenter(mPresenter);
         linkViews();
 
-        mPresenter.onViewCreated();
+        getBasePresenter().onViewCreated();
     }
 
     private void linkViews() {
@@ -167,7 +165,7 @@ public class MainActivity extends BaseActivity
             return;
         }
 
-        Intent startMonthlyExpensesActivityIntent = new Intent(mContext, MonthlyTransactionsActivity.class);
+        Intent startMonthlyExpensesActivityIntent = new Intent(context, MonthlyTransactionsActivity.class);
         startMonthlyExpensesActivityIntent.putExtra(MonthlyTransactionsActivity.INTENT_KEY_MONTHLY_TRANSACTIONS,
                 transactionsPerMonth);
         startActivity(startMonthlyExpensesActivityIntent);

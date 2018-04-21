@@ -162,7 +162,8 @@ public class TransactionsListModel implements TransactionsListContract.Model {
         }
     }
 
-    // TODO: Use database instead -> Realm
+    // TODO: Use databas
+    // e instead -> Realm
     private Map<String, Company> generateCompaniesMap() {
         Map<String, Company> companiesMap = new HashMap<>();
 
