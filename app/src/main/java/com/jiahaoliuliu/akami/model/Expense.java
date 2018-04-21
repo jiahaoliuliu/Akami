@@ -60,7 +60,7 @@ public class Expense implements ITransactions {
         String currencyAndQuantity = matcher.group(1);
 
         // The first three characters are the currency
-        this.currency = Currency.toCurrency(currencyAndQuantity.substring(0, 3));
+        this.currency = Currency.Companion.toCurrency(currencyAndQuantity.substring(0, 3));
 
         // Quantity
         try {
