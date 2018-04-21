@@ -18,8 +18,6 @@ public class Expense implements ITransactions {
     // Static variables for parsing. Since the parsing is done in each expense, it does make sense to have them as static
     private static final SimpleDateFormat simpleDateFormatter = new SimpleDateFormat(DATE_FORMAT);
 
-    private String id;
-
     private Date date;
 
     private Currency currency;
@@ -53,9 +51,6 @@ public class Expense implements ITransactions {
             throw new IllegalArgumentException("The type of the sms suppose to be expense 1 but it does not matches");
         }
 
-        // Id
-        this.id = sms.getId();
-
         // Currency
         String currencyAndQuantity = matcher.group(1);
 
@@ -78,11 +73,6 @@ public class Expense implements ITransactions {
             this.date = sms.getDate();
         }
         this.companyId = matcher.group(4);
-    }
-
-    @Override
-    public String getId() {
-        return id;
     }
 
     @Override
@@ -138,7 +128,6 @@ public class Expense implements ITransactions {
 
         if (Float.compare(expense.quantity, quantity) != 0) return false;
         if (isFirstTransactionOfTheMonth != expense.isFirstTransactionOfTheMonth) return false;
-        if (id != null ? !id.equals(expense.id) : expense.id != null) return false;
         if (date != null ? !date.equals(expense.date) : expense.date != null) return false;
         if (currency != expense.currency) return false;
         if (creditCard != null ? !creditCard.equals(expense.creditCard) : expense.creditCard != null)
@@ -147,28 +136,4 @@ public class Expense implements ITransactions {
 
     }
 
-    @Override
-    public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (date != null ? date.hashCode() : 0);
-        result = 31 * result + (currency != null ? currency.hashCode() : 0);
-        result = 31 * result + (quantity != +0.0f ? Float.floatToIntBits(quantity) : 0);
-        result = 31 * result + (creditCard != null ? creditCard.hashCode() : 0);
-        result = 31 * result + (companyId != null ? companyId.hashCode() : 0);
-        result = 31 * result + (isFirstTransactionOfTheMonth ? 1 : 0);
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        return "Expense{" +
-                "id='" + id + '\'' +
-                ", date=" + date +
-                ", currency=" + currency +
-                ", quantity=" + quantity +
-                ", creditCard='" + creditCard + '\'' +
-                ", companyId='" + companyId + '\'' +
-                ", isFirstTransactionOfTheMonth=" + isFirstTransactionOfTheMonth +
-                '}';
-    }
 }
