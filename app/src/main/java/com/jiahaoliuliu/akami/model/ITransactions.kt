@@ -7,49 +7,25 @@ import java.util.Date
  */
 interface ITransactions {
 
-    /**
-     * Get the type of the transaction
-     */
-    fun getType(): TransactionsType
+    var date: Date
+
+    var type: TransactionsType
+
+    var currency: Currency
+
+    var quantity: Float
 
     /**
-     * Get the transactions's currency
+     * The quantity on the original currency
      */
-    fun getCurrency(): Currency
+    var originalCurrencyQuantity: Float
 
     /**
-     * The quantity of the transaction (Converted to the default currency)
+     * The source of the transaction
      */
-    fun getQuantity(): Float
+    var source: String
 
-    /**
-     * Get the quantity on the original currency
-     */
-    fun getOriginalCurrencyQuantity(): Float
+    var destination: String
 
-    /**
-     * Get the source of the transaction
-     */
-    fun getSource(): String
-
-    /**
-     * Get where does the money goes
-     */
-    fun getDestination(): String
-
-    /**
-     * Get the date of the transaction
-     */
-    fun getDate(): Date
-
-    // TODO: Optimize this
-    /**
-     * Check if this is the first transaction of the month
-     */
-    fun isFirstTransactionOfTheMonth(): Boolean
-
-    /**
-     * Set the current transaction as the first transaction of the month
-     */
-    fun setFirstTransactionOfTheMonth(isFirstTransactionOfTheMonth:Boolean)
+    var firstTransactionOfTheMonth: Boolean
 }
