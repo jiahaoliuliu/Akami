@@ -10,17 +10,7 @@ import java.util.Date;
  */
 public interface ITransactions {
 
-    static final String TAG = "ITransactions";
-
-    // TODO: Set colour
-    // TODO: Create the super class Transactions which contains the follow classes
-    // The type of the transactions
-    enum Type {
-        EXPENSE,
-        WITHDRAW,
-        SALARY,
-        UNKNOWN;
-    }
+    String TAG = "ITransactions";
 
     // Average from: http://www.x-rates.com/average/?from=RUB&to=AED&amount=1&year=2016
     enum Currency {
@@ -86,7 +76,7 @@ public interface ITransactions {
 
     String getId();
 
-    Type getType();
+    TransactionsType getType();
 
     Currency getCurrency();
 
