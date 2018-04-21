@@ -59,8 +59,8 @@ public class TransactionsListAdapter extends RecyclerView.Adapter<TransactionsLi
     public void onBindViewHolder(ViewHolder holder, int position) {
         final ITransactions transaction = mTransactionsList.get(position);
 
-        // Set the header
-        if (transaction.isFirstTransactionOfTheMonth() && position != 0) {
+        // Set the header -> If it is the first transaction of the month
+        if (transaction.getFirstTransactionOfTheMonth() && position != 0) {
             holder.mHeaderLinearLayout.setVisibility(View.VISIBLE);
             long currentMonthlyKey = HeaderUtility.getHeaderMonthlyKeyByTransaction(transaction);
             // Set the month
