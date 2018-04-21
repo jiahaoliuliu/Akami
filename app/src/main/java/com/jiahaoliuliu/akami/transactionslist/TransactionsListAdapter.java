@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.jiahaoliuliu.akami.R;
 import com.jiahaoliuliu.akami.model.Company;
+import com.jiahaoliuliu.akami.model.Currency;
 import com.jiahaoliuliu.akami.model.ITransactions;
 import com.jiahaoliuliu.akami.model.Withdraw;
 import com.jiahaoliuliu.akami.utils.HeaderUtility;
@@ -117,7 +118,7 @@ public class TransactionsListAdapter extends RecyclerView.Adapter<TransactionsLi
         String quantity = String.format("%.02f", transaction.getQuantity()) + " " + mContext.getResources().getString(R.string.currency_aed);
 
         // If the
-        if (transaction.getCurrency() != ITransactions.Currency.DIRHAMS) {
+        if (transaction.getCurrency() != Currency.DIRHAMS) {
             quantity += " (" + String.format("%.02f", transaction.getOriginalCurrencyQuantity()) + " " + transaction.getCurrency().getCode() + ")";
         }
 

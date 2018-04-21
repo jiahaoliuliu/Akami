@@ -149,8 +149,8 @@ public class Withdraw implements ITransactions {
     }
 
     @Override
-    public Type getType() {
-        return Type.WITHDRAW;
+    public TransactionsType getType() {
+        return TransactionsType.WITHDRAW;
     }
 
     @Override

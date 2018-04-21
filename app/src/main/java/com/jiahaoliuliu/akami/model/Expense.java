@@ -1,7 +1,5 @@
 package com.jiahaoliuliu.akami.model;
 
-import android.util.Log;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -88,8 +86,8 @@ public class Expense implements ITransactions {
     }
 
     @Override
-    public Type getType() {
-        return Type.EXPENSE;
+    public TransactionsType getType() {
+        return TransactionsType.EXPENSE;
     }
 
     @Override
