@@ -125,7 +125,6 @@ public class TransactionsListModel implements TransactionsListContract.Model {
             switch (sms.getType()) {
                 case EXPENSE_1:
                 case EXPENSE_2:
-//                    transactions = new Expense(sms);
                     transactions = new Expense(sms);
                     break;
                 case WITHDRAW_1:
