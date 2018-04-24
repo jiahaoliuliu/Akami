@@ -21,9 +21,9 @@ data class Expense (val sms: Sms): ITransactions {
     override var currency = Currency.UNKNOWN
     override var quantity = 0.0F
     override var originalCurrencyQuantity: Float = 0.0F
-    override var source: String = ""
-    override var destination: String = ""
-    override var firstTransactionOfTheMonth: Boolean = false
+    override var source = ""
+    override var destination = ""
+    override var firstTransactionOfTheMonth = false
 
     init {
         when(sms.type) {
