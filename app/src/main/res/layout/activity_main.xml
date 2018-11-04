@@ -15,7 +15,7 @@
         android:id="@+id/transactions_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.MainActivity"
+        tools:context=".transactionslist.MainActivity"
         android:layout_below="@+id/header_linear_layout"
         >
     </android.support.v7.widget.RecyclerView>
